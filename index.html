@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jVmIf2zVD/cRBDrbMtM0BzdRa4G5S0OQJBermkakGt0=' 'sha256-T1WILTWjuLVzhfDzUxla1A0bw/UAydFoN9NWjN6ywvA='; style-src 'sha256-1UgoVEf2IJvNCTvVccWuEVd2rxtH+ER7Ug+BQ3uYx6Y='; img-src data:; connect-src https://api.color.pizza; base-uri 'none'; form-action 'none'">
+<title>Dathanna: swipe to find colours that pass WCAG AA</title>
+
+<!--
+  Dathanna by Nuadyr. Single file, no build step, no dependencies.
+  Dark mode follows the system setting; the Theme button adds a manual override.
+  Every colour offered passes AA text contrast (4.5:1) against the chosen backdrop after alpha compositing.
+  No manifest and no service worker on purpose.
+  Colour names use the built-in CSS list by default. "Look up colour names online" is opt-in (off by default) and then uses the Color Name API (api.color.pizza).
+  A Content-Security-Policy meta restricts the page to its own inline code (by hash) and that one API host. If you edit an inline style or script block, regenerate its hash.
+-->
+
+<meta name="description" content="Swipe through random colours with names, hex and RGBA codes. Every one passes WCAG 2.1 and 2.2 AA contrast. Keep the ones you like, veto the rest.">
+<meta name="author" content="Nuadyr">
+<meta name="application-name" content="Dathanna">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f3f5ef" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1511" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://nuadyr.github.io/Dathanna/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317261f'/%3E%3Cpath d='M8 24V8l8 9 8-9v16' fill='none' stroke='%23f4f7f1' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dathanna">
+<meta property="og:title" content="Dathanna: swipe to find colours that pass WCAG AA">
+<meta property="og:description" content="Swipe right to keep a colour, left to veto it. Every colour passes AA contrast.">
+<meta property="og:url" content="https://nuadyr.github.io/Dathanna/">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dathanna: swipe to find colours that pass WCAG AA">
+<meta name="twitter:description" content="Swipe right to keep a colour, left to veto it. Every colour passes AA contrast.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Dathanna",
+  "url": "https://nuadyr.github.io/Dathanna/",
+  "description": "A swipe-style colour explorer. Random RGBA colours that pass WCAG AA contrast, with closest colour name, hex and RGBA codes.",
+  "applicationCategory": "DesignApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "en-GB",
+  "isAccessibleForFree": true,
+  "author": { "@type": "Person", "name": "Nuadyr" }
+}
+</script>
+<script>
+/* One-time move of data saved under the old name (Spectrum) to the new keys, so nobody loses their library, vetoes or settings. */
+try { ['theme', 'theme-mode', 'motion-paused', 'library', 'blacklist', 'settings', 'name-cache'].forEach((k) => { const old = localStorage.getItem('spectrum-' + k); if (old === null) return; if (localStorage.getItem('dathanna-' + k) === null) localStorage.setItem('dathanna-' + k, old); localStorage.removeItem('spectrum-' + k); }); } catch { /* storage unavailable */ }
+/* Apply a saved theme before first paint so there is no flash. */
+try { const t = localStorage.getItem('dathanna-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch { /* storage unavailable */ }
+</script>
+<style>
+/* Design system layers: 1 tokens, 2 base, 3 layout, 4 components, 5 your page, 6 user preferences and assistive modes. */
+:root {
+  color-scheme: light dark;
+
+  --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-head: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+
+  --paper:      light-dark(#f3f5ef, #0e1511);
+  --surface:    light-dark(#ffffff, #17211b);
+  --surface-2:  light-dark(#e9eee5, #213028);
+  --ink:        light-dark(#111a15, #eef3ec);
+  --ink-soft:   light-dark(#33423a, #c4d0c6);
+  --line:       light-dark(#55645b, #8fa497);
+  --line-soft:  light-dark(#c3cdc2, #34453b);
+
+  --brand:      light-dark(#17261f, #0a110d);
+
+  --on-brand:   #f4f7f1;
+  --on-brand-soft: #cfdcd0;
+
+  --action:       light-dark(#1b4d38, #8fd9b0);
+  --action-hover: light-dark(#123626, #b0e8c8);
+  --on-action:    light-dark(#ffffff, #07140d);
+  --link:         light-dark(#0a4a73, #8cc8f2);
+  --focus:        light-dark(#17261f, #f4f7f1);
+
+  --ok-ink:      light-dark(#064e3f, #8fe0c0); --ok-tint:      light-dark(#e0f3ec, #12302a);
+  --warn-ink:    light-dark(#5a3d00, #f2cf85); --warn-mark:    light-dark(#a85f00, #e8a23a); --warn-tint:    light-dark(#fbf0d6, #33280f);
+  --problem-ink: light-dark(#7a0f1f, #ffb3bb); --problem-mark: light-dark(#c0262d, #ff6f78); --problem-tint: light-dark(#fbe4e7, #38161b);
+  --info-ink:    light-dark(#0f3f7a, #a9cdf5); --info-mark:    light-dark(#1f66b0, #6fb0f0); --info-tint:    light-dark(#e1ecf8, #14283f);
+
+  --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem;
+  --r-1: 0.25rem; --r-2: 0.5rem; --r-3: 0.875rem;
+  --t-sm:   clamp(0.875rem, 0.84rem + 0.15vw, 0.9375rem);
+  --t-base: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+  --t-md:   clamp(1.125rem, 1.04rem + 0.4vw, 1.3125rem);
+  --t-lg:   clamp(1.375rem, 1.18rem + 0.85vw, 1.75rem);
+  --t-xl:   clamp(1.75rem, 1.35rem + 1.7vw, 2.5rem);
+  --pad-card: clamp(var(--s-4), 3vw, var(--s-5));
+  --target: 2.75rem;
+  --measure: 70rem;
+  --text-measure: 42rem;
+  --rule: 0.125rem;
+  --settle: 270ms;          /* card fly-off and snap-back; JS reads this same value */
+  --aa-min: 2.5rem; --aa-max: 3.5rem; --aa-fluid: 14cqi;
+
+  --mask-chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m9.5 6 6 6-6 6' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --mask-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3.5' y='3.5' width='17' height='17' rx='4' fill='none' stroke='black' stroke-width='2.2'/%3E%3Cpath d='M12 11v5M12 7.6v.2' stroke='black' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  --mask-ok: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='black' stroke-width='2.2'/%3E%3Cpath d='m7.8 12.3 3 3 5.4-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --mask-warn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.8 21.2 19.5H2.8z' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='M12 10v4.5M12 17v.2' stroke='black' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  --mask-problem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.8 21.2 12 12 21.2 2.8 12z' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='m9 9 6 6M15 9l-6 6' stroke='black' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+/* Engines without light-dark() (before 2024) would drop every token above: pin the light palette instead. */
+@supports not (color: light-dark(#fff, #000)) {
+  :root {
+    --paper: #f3f5ef;
+    --surface: #ffffff;
+    --surface-2: #e9eee5;
+    --ink: #111a15;
+    --ink-soft: #33423a;
+    --line: #55645b;
+    --line-soft: #c3cdc2;
+    --brand: #17261f;
+    --action: #1b4d38;
+    --action-hover: #123626;
+    --on-action: #ffffff;
+    --link: #0a4a73;
+    --focus: #17261f;
+    --ok-ink: #064e3f;
+    --ok-tint: #e0f3ec;
+    --warn-ink: #5a3d00;
+    --warn-mark: #a85f00;
+    --warn-tint: #fbf0d6;
+    --problem-ink: #7a0f1f;
+    --problem-mark: #c0262d;
+    --problem-tint: #fbe4e7;
+    --info-ink: #0f3f7a;
+    --info-mark: #1f66b0;
+    --info-tint: #e1ecf8;
+  }
+}
+
+/* 1. Tokens. light-dark(light value, dark value) follows the system; data-theme forces one side. */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 100%; -webkit-text-size-adjust: 100%; scroll-padding-block-start: var(--s-6); }
+body {
+  margin: 0; min-block-size: 100vb; min-block-size: 100dvb; display: flex; flex-direction: column;
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: var(--t-base); line-height: 1.6;
+}
+h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; margin: 0; color: var(--ink); text-wrap: balance; }
+h1 { font-size: var(--t-xl); }
+h2 { font-size: var(--t-lg); }
+h3 { font-size: var(--t-md); }
+h4 { font-family: var(--font-body); font-size: var(--t-base); font-weight: 700; line-height: 1.3; }
+p, ul, ol, dl { margin: 0; }
+p + p { margin-block-start: var(--s-3); }
+a { color: var(--link); text-decoration-thickness: 0.09em; text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 0.18em; }
+code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.9em; background: var(--surface-2); padding: 0 0.25em; border-radius: var(--r-1); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 0.25rem solid var(--focus); outline-offset: 0.125rem; }
+h1:focus, h2:focus, main:focus { outline: none; }
+h1:focus-visible, h2:focus-visible { outline: 0.25rem solid var(--focus); outline-offset: 0.25rem; }
+.visually-hidden, [role="status"]:empty { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; inset-inline-start: var(--s-3); inset-block-start: -10rem; z-index: 10; padding: var(--s-2) var(--s-4); background: var(--brand); color: var(--on-brand); border-radius: var(--r-2); font-weight: 700; }
+.skip-link:focus { inset-block-start: var(--s-3); }
+
+/* 2. Base */
+.wrap { inline-size: 100%; max-inline-size: var(--measure); margin-inline: auto; padding-inline: var(--s-4); }
+main { flex: 1 0 auto; inline-size: 100%; max-inline-size: var(--measure); margin-inline: auto; padding: var(--s-5) var(--s-4) var(--s-7); }
+.stack > * + * { margin-block-start: var(--s-4); }
+.stack-lg > * + * { margin-block-start: var(--s-6); }
+.row { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
+
+/* 3. Layout */
+
+/* 4. Components */
+.site-header { display: grid; gap: var(--s-3); padding-block-end: var(--s-5); }
+.site-header .lede { font-size: var(--t-md); max-inline-size: var(--text-measure); color: var(--ink-soft); }
+
+/* Page header */
+button {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-block-size: var(--target); min-inline-size: var(--target); padding: var(--s-2) var(--s-4);
+  font: inherit; font-weight: 700; line-height: 1.3; text-align: center; text-decoration: none; cursor: pointer;
+  color: var(--on-action); background: var(--action); border: var(--rule) solid var(--action); border-radius: var(--r-2);
+}
+button:hover:not(:disabled) { background: var(--action-hover); border-color: var(--action-hover); text-decoration: none; }
+button.secondary { color: var(--ink); background: var(--surface); border-color: var(--line); }
+button.secondary:hover:not(:disabled) { background: var(--surface-2); border-color: var(--ink); }
+button.small { padding: var(--s-1) var(--s-3); font-size: var(--t-sm); }
+button:disabled, button[aria-disabled="true"] { cursor: not-allowed; color: var(--ink-soft); background: var(--surface-2); border-color: var(--line-soft); }
+
+/* Buttons. Plain buttons are the main action. */
+legend { font-weight: 700; }
+fieldset { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
+select {
+  inline-size: 100%; min-block-size: var(--target); padding: var(--s-2) var(--s-3);
+  font: inherit; color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2);
+}
+.hint { color: var(--ink-soft); font-size: var(--t-sm); }
+.checkline { display: flex; align-items: center; gap: var(--s-3); min-block-size: var(--target); }
+.checkline input { inline-size: 1.5rem; block-size: 1.5rem; margin: 0; flex: none; accent-color: var(--action); }
+
+/* Forms */
+.panel { background: var(--surface); border: var(--rule) solid var(--line-soft); border-radius: var(--r-3); padding: var(--s-5); }
+.panel > * + * { margin-block-start: var(--s-4); }
+.panel > h2 + *, .panel > h3 + * { margin-block-start: var(--s-3); }
+.note, [role="alert"]:not([hidden]) {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-3); align-items: start;
+  padding: var(--s-3) var(--s-4); color: var(--info-ink); background: var(--info-tint);
+  border: var(--rule) solid var(--info-mark); border-inline-start-width: 0.5rem; border-radius: var(--r-2);
+}
+.note::before, [role="alert"]:not([hidden])::before {
+  content: ""; inline-size: 1.5rem; block-size: 1.5rem; margin-block-start: 0.1rem; background: currentColor;
+  mask: var(--mask-info) center / contain no-repeat; -webkit-mask: var(--mask-info) center / contain no-repeat;
+}
+.note > * { min-inline-size: 0; }
+.note p + p { margin-block-start: var(--s-2); }
+.note--warn { color: var(--warn-ink); background: var(--warn-tint); border-color: var(--warn-mark); }
+.note--warn::before { mask-image: var(--mask-warn); -webkit-mask-image: var(--mask-warn); }
+[role="alert"]:not([hidden]) { color: var(--problem-ink); background: var(--problem-tint); border-color: var(--problem-mark); }
+[role="alert"]:not([hidden])::before { mask-image: var(--mask-problem); -webkit-mask-image: var(--mask-problem); }
+[role="status"] { color: var(--ink-soft); font-size: var(--t-sm); }
+
+/* Panels, notes and live regions */
+.badge { display: inline-flex; align-items: center; gap: var(--s-1); padding: 0 var(--s-2); min-block-size: 1.75rem; border: var(--rule) solid currentColor; border-radius: var(--r-2); font-size: var(--t-sm); font-weight: 700; color: var(--ink); background: var(--surface); }
+.badge::before { content: ""; inline-size: 1rem; block-size: 1rem; flex: none; background: currentColor; mask: var(--mask-info) center / contain no-repeat; -webkit-mask: var(--mask-info) center / contain no-repeat; }
+.badge--ok { color: var(--ok-ink); background: var(--ok-tint); }
+.badge--ok::before { mask-image: var(--mask-ok); -webkit-mask-image: var(--mask-ok); }
+.badge--problem { color: var(--problem-ink); background: var(--problem-tint); }
+.badge--problem::before { mask-image: var(--mask-problem); -webkit-mask-image: var(--mask-problem); }
+.badge--info { color: var(--info-ink); background: var(--info-tint); }
+
+/* Status badge: word plus shape plus colour */
+details { border-block-start: var(--rule) solid var(--line-soft); padding-block-start: var(--s-2); }
+summary { display: flex; align-items: center; gap: var(--s-2); min-block-size: var(--target); cursor: pointer; font-weight: 700; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: ""; inline-size: 1.25rem; block-size: 1.25rem; flex: none; background: currentColor; mask: var(--mask-chev) center / contain no-repeat; -webkit-mask: var(--mask-chev) center / contain no-repeat; }
+details[open] > summary::before { transform: rotate(90deg); }
+summary h2, summary h3, summary h4 { display: inline; font-size: inherit; font-family: var(--font-body); font-weight: 700; margin: 0; }
+details > :not(summary) { margin-block-start: var(--s-3); }
+
+/* Disclosure */
+.site-footer { background: var(--brand); color: var(--on-brand); padding-block: var(--s-5); }
+.site-footer a { color: var(--on-brand); }
+.site-footer .hint { color: var(--on-brand-soft); }
+.site-footer :focus-visible { outline-color: var(--on-brand); }
+
+/* Footer */
+html.is-modal { overflow: hidden; }
+.about { max-inline-size: var(--text-measure); }
+
+/* 5. Your page */
+.sw { container-type: inline-size; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; background-color: var(--sw-bg, #fff); border: var(--rule) solid var(--line); border-radius: var(--r-2); forced-color-adjust: none; }
+.sw__fill { min-block-size: 7rem; background-image: linear-gradient(var(--sw-fg, #000), var(--sw-fg, #000)); forced-color-adjust: none; }
+.sw__text { display: grid; align-content: center; justify-items: center; gap: var(--s-1); padding: var(--s-3); color: var(--sw-fg, #000); text-align: center; forced-color-adjust: none; }
+.sw__aa { font: 700 clamp(var(--aa-min), 8vw, var(--aa-max)) / 1 var(--font-head); }
+@supports (width: 1cqi) {
+  .sw__aa { font-size: clamp(var(--aa-min), var(--aa-fluid), var(--aa-max)); }
+}
+.sw__sample { font-size: var(--t-sm); font-weight: 700; }
+.sw-dot { display: inline-block; inline-size: 1.75rem; block-size: 1.75rem; flex: none; border: var(--rule) solid var(--line); border-radius: var(--r-1); background-color: var(--sw-bg, #fff); background-image: linear-gradient(var(--sw-fg, #000), var(--sw-fg, #000)); forced-color-adjust: none; }
+.codes { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-1) var(--s-3); font-size: var(--t-sm); }
+.codes dt { color: var(--ink-soft); }
+.codes dd { margin: 0; overflow-wrap: anywhere; }
+
+/* Swatch: left half is the colour at its own opacity over its backdrop, right half is text in that colour on the backdrop. */
+
+/* Library */
+.tablist { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.tablist [role="tab"] { color: var(--ink); background: var(--surface); border-color: var(--line); }
+.tablist [role="tab"]:hover { background: var(--surface-2); border-color: var(--ink); }
+.tablist [role="tab"][aria-selected="true"] { color: var(--ink); background: var(--surface); border: var(--rule) dashed var(--ink); }
+.tablist [role="tab"][aria-selected="true"]:hover { background: var(--surface-2); border-color: var(--ink); }
+
+/* Theme Builder */
+.tb-layout { display: grid; gap: var(--s-5); }
+.tb-main { display: grid; gap: var(--s-4); min-inline-size: 0; order: -1; }
+.tb-main > * { min-inline-size: 0; margin: 0; }
+.tb-vars { display: grid; gap: var(--s-2); }
+.tb-vars > * { margin: 0; }
+@media (min-width: 64rem) { .tb-main { order: 0; } .tb-layout { grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); align-items: start; } .tb-controls { position: sticky; inset-block-start: var(--s-3); max-block-size: calc(100dvh - 2rem); overflow-y: auto; padding-inline-end: var(--s-2); } }
+.tb-roles { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: var(--s-2); }
+.tb-role { justify-content: flex-start; text-align: start; font-size: var(--t-sm); }
+.tb-role[aria-pressed="true"] { border: var(--rule) dashed var(--ink); }
+.tb-role__t { display: grid; gap: 0; min-inline-size: 0; } .tb-role__t code { font-weight: 400; overflow-wrap: anywhere; }
+.tb-in { flex: 1 1 10rem; min-inline-size: 0; min-block-size: var(--target); padding: var(--s-2) var(--s-3); font: inherit; color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2); }
+.tb-checks { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
+.tb-checks li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); }
+.tb-checks .hint { flex: 1 1 8rem; }
+/* Colour picker popover: small and dimmed behind. Compact by default (phones), a little roomier from sm up. */
+.tbpop { inline-size: min(20rem, calc(100vw - 2rem)); max-inline-size: none; max-block-size: min(30rem, 76dvh); margin: auto; padding: 0; overflow: hidden; color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-3); box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 0.4); }
+.tbpop[open] { display: flex; flex-direction: column; }
+.tbpop::backdrop { background: rgb(0 0 0 / 0.5); }
+.tbpop__head { flex: none; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-3); padding: var(--s-3) var(--s-3) var(--s-2); }
+.tbpop__head h2 { font-size: var(--t-md); }
+.tbpop__head p { margin: 0; overflow-wrap: anywhere; }
+.tbpop__tools { flex: none; display: grid; gap: var(--s-1); padding: 0 var(--s-3) var(--s-2); }
+.tbpop__tools > * { margin: 0; }
+.tbpop__tools .checkline { min-block-size: 2rem; font-size: var(--t-sm); }
+.tbpop__tools .checkline input { inline-size: 1.25rem; block-size: 1.25rem; }
+.tbpop__use { display: flex; align-items: center; gap: var(--s-2); }
+.tbpop__alpha { display: grid; gap: var(--s-1); }
+.tbpop__alpha label { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); font-size: var(--t-sm); font-weight: 700; }
+.tbpop__alpha output { font-variant-numeric: tabular-nums; }
+.tbpop__alpha input[type="range"] { inline-size: 100%; min-block-size: var(--target); margin: 0; accent-color: var(--action); }
+.tbpop input[type="search"] { inline-size: 100%; -webkit-appearance: none; appearance: none; }
+.tbpop input[type="search"]::-webkit-search-cancel-button { display: none; }
+.tbpop .tbpop__tiles { flex: 1 1 auto; min-block-size: 6rem; margin: 0 var(--s-3) var(--s-3); padding: var(--s-2); gap: var(--s-1); align-content: start; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr)); }
+.tbpop__tiles .tile { border: 1px solid var(--line-soft); border-radius: var(--r-1); }
+.tbpop__tiles .tile[aria-pressed="true"] { box-shadow: inset 0 0 0 0.1875rem #fff, inset 0 0 0 0.375rem #000; }
+.tb-sample { display: grid; place-items: center; flex: none; inline-size: 2.5rem; block-size: 2rem; font-weight: 700; border: var(--rule) solid var(--line); border-radius: var(--r-1); forced-color-adjust: none; }
+/* The mock page. Everything is scoped to .tb and driven by the --tb-* variables, so the app's own styles never leak in.
+   It is built from real HTML elements so the theme is judged on what pages actually contain. Nothing inside it can be reached or operated:
+   links, buttons and controls ignore the pointer and are taken out of the tab order by the script, and a click is matched to the nearest themed box instead.
+   The frame itself stands in for body, and a plain div stands in for main, because this page already has a main landmark. */
+.tb { --tb-bg: #fff; --tb-surface: #f4f4f5; --tb-text: #111; --tb-muted: #595959; --tb-disabled: #6f6f6f; --tb-border: #c4c4c8; --tb-border-strong: #767676; --tb-primary: #1d4ed8; --tb-on-primary: #fff; --tb-accent: #b45309; --tb-on-accent: #fff; --tb-focus: #6d28d9; --tb-danger: #b91c1c; --tb-success: #15803d; --tb-warning: #8a5300; --tb-visited: #6b21a8; container-type: inline-size; isolation: isolate; overflow: hidden; color: var(--tb-text); background: var(--tb-bg); accent-color: var(--tb-primary); border: var(--rule) solid #8a8a8a; border-radius: var(--r-3); font: 1rem/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; forced-color-adjust: none; -webkit-user-select: none; user-select: none; }
+.tb *, .tb *::before, .tb *::after { box-sizing: border-box; }
+.tb :where(p, ul, ol, menu, dl, dd, figure, blockquote, address, fieldset, table, details, dialog, hr, legend) { margin: 0; }
+.tb :where(ul, ol, menu) { padding: 0; }
+.tb :where(button, input, select, textarea) { font: inherit; letter-spacing: inherit; }
+.tb :where(a, button, input, select, textarea, summary) { pointer-events: none; }
+.tb [data-role] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tb-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem; padding: 0.9rem 1.25rem; background: var(--tb-surface); border-block-end: 1px solid var(--tb-border); }
+.tb-logo { flex: 1 1 auto; font-size: 1.15rem; font-weight: 800; }
+.tb-links, .tb-menu { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; list-style: none; }
+.tb-menu { gap: 0.75rem; }
+@container (max-width: 36rem) { .tb-navbar { order: 3; flex-basis: 100%; } }
+.tb-search { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.tb-search .tb-input { flex: 1 1 9rem; inline-size: auto; min-inline-size: 0; }
+.tb-link { color: var(--tb-primary); font-weight: 600; text-decoration: underline; text-underline-offset: 0.2em; border-radius: 0.25rem; }
+.tb-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.6rem 1.1rem; border: 2px solid var(--tb-primary); border-radius: 0.5rem; font-weight: 700; line-height: 1.3; text-align: center; color: var(--tb-on-primary); background: var(--tb-primary); }
+.tb-btn--o { color: var(--tb-primary); background: transparent; }
+.tb .tb-btn:disabled { color: var(--tb-disabled); background: transparent; border-color: var(--tb-border); }
+.tb-card > .tb-link, .tb-card > .tb-btn, .tb-alert > .tb-link, .tb-dialog > .tb-link { justify-self: start; }
+.tb-page { display: block; }
+.tb-hero, .tb-sec { display: grid; gap: 1rem; padding: 1.5rem 1.25rem; }
+.tb-hero { max-inline-size: 46rem; padding-block: 2.25rem 1.5rem; }
+.tb-hero > .tb-badge { justify-self: start; }
+.tb-sec + .tb-sec { padding-block-start: 0; }
+.tb-h1 { font-size: clamp(1.9rem, 7cqi, 3rem); font-weight: 800; line-height: 1.2; }
+.tb-h2 { font-size: 1.4rem; font-weight: 800; line-height: 1.25; }
+.tb-h3 { font-size: 1.1rem; font-weight: 700; line-height: 1.35; }
+.tb-m, .tb [data-role="muted"] { color: var(--tb-muted); }
+.tb-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.tb-hr { block-size: 1px; margin-block: 0.75rem; margin-inline: 1.25rem; border: 0; background: var(--tb-border); }
+.tb-grid, .tb-two { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); align-items: start; }
+.tb-two { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+.tb-card { display: grid; gap: 0.75rem; align-content: start; min-inline-size: 0; padding: 1.1rem; background: var(--tb-surface); border: 1px solid var(--tb-border); border-radius: 0.75rem; }
+.tb-badge { padding: 0.15rem 0.7rem; border-radius: 99px; font-size: 0.875rem; font-weight: 700; color: var(--tb-on-accent); background: var(--tb-accent); }
+/* Text blocks. Stacked paragraphs are spaced by a full line plus a gap, and nothing here has a fixed height, so user text-spacing overrides do not clip. */
+.tb-prose > * + * { margin-block-start: 1.25rem; }
+.tb-quotefig { display: grid; gap: 0.5rem; }
+.tb-quote { padding-inline-start: 1rem; border-inline-start: 0.25rem solid var(--tb-border); font-size: 1.125rem; font-style: italic; }
+.tb-cap { font-size: 0.9375rem; }
+.tb-list { padding-inline-start: 1.25rem; }
+.tb-list li + li { margin-block-start: 0.25rem; }
+.tb-dl { display: grid; gap: 0.75rem; }
+.tb-dl > div { display: grid; gap: 0.5rem; }
+.tb-addr { font-style: normal; }
+/* Media. The picture and the chart are redrawn by the script in the theme's own colours. */
+.tb-fig { display: grid; gap: 0.5rem; justify-items: start; min-inline-size: 0; }
+.tb-img, .tb-canvas { display: block; inline-size: 100%; block-size: auto; border: 1px solid var(--tb-border); border-radius: 0.5rem; background: var(--tb-surface); }
+.tb-img { aspect-ratio: 16 / 9; }
+.tb-canvas { aspect-ratio: 3 / 1; }
+/* Disclosure and dialog */
+.tb-details { padding: 0 1rem; background: var(--tb-surface); border: 1px solid var(--tb-border); border-radius: 0.5rem; }
+.tb-details > p { margin: 0; padding-block: 0 1rem; }
+.tb-details + .tb-details { margin-block-start: 0.75rem; }
+.tb-dialog { position: relative; inset: auto; inline-size: auto; max-inline-size: 28rem; block-size: auto; max-block-size: none; margin: 0; padding: 1.25rem; overflow: visible; color: var(--tb-text); background: var(--tb-surface); border: 1px solid var(--tb-border); border-radius: 0.75rem; box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.25); }
+.tb-dialog[open] { display: grid; gap: 0.75rem; }
+.tb-alert { position: relative; display: grid; gap: 0.5rem; overflow: hidden; padding: 0.8rem 1rem 0.8rem 1.5rem; background: var(--tb-surface); border: 1px solid var(--tb-border); border-radius: 0.5rem; }
+.tb-alert::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 0.4rem; background: var(--tb-accent); }
+/* Table */
+.tb-tablewrap { overflow-x: auto; }
+.tb-table { inline-size: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+.tb-table caption { padding-block-end: 0.5rem; text-align: start; }
+.tb-table th, .tb-table td { padding: 0.65rem 0.9rem; border: 1px solid var(--tb-border); text-align: start; overflow-wrap: anywhere; }
+.tb-table thead, .tb-table tfoot, .tb-table tbody tr:nth-child(even) { background: var(--tb-surface); }
+.tb-col-wide { inline-size: 40%; }
+/* Forms */
+.tb-fieldset { min-inline-size: 0; }
+.tb-fieldset legend { padding-inline: 0.35rem; }
+.tb-field { display: grid; gap: 0.4rem; min-inline-size: 0; }
+.tb-label { font-size: 0.9375rem; font-weight: 700; }
+.tb-input { inline-size: 100%; min-block-size: 2.75rem; padding: 0.6rem 0.75rem; color: var(--tb-text); background: var(--tb-bg); border: 1px solid var(--tb-border-strong); border-radius: 0.5rem; line-height: 1.4; }
+input.tb-input, textarea.tb-input { appearance: none; }
+textarea.tb-input { resize: none; }
+.tb-input::placeholder { color: var(--tb-disabled); opacity: 1; }
+.tb-listbox { padding: 0.25rem; }
+.tb-input option, .tb-input optgroup { color: var(--tb-text); background: var(--tb-bg); }
+.tb-input optgroup { color: var(--tb-muted); font-style: normal; font-weight: 700; }
+.tb-input option:checked { color: var(--tb-on-primary); background: linear-gradient(var(--tb-primary), var(--tb-primary)); }
+.tb-choices { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
+.tb-choice { display: flex; align-items: center; gap: 0.6rem; min-block-size: 2.75rem; }
+.tb-choice input { flex: none; inline-size: 1.25rem; block-size: 1.25rem; margin: 0; }
+.tb input[type="range"] { inline-size: 100%; margin: 0; }
+.tb-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+.tb-inline input[type="range"] { flex: 1 1 8rem; inline-size: auto; }
+.tb-out { display: inline-block; min-inline-size: 2.5rem; padding: 0.15rem 0.6rem; border: 1px solid var(--tb-border-strong); border-radius: 0.375rem; background: var(--tb-bg); font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; }
+.tb progress, .tb meter { appearance: none; inline-size: 100%; max-inline-size: 22rem; block-size: 0.9rem; overflow: hidden; vertical-align: middle; background: var(--tb-bg); border: 1px solid var(--tb-border-strong); border-radius: 99px; }
+.tb progress::-webkit-progress-bar { background: var(--tb-bg); }
+.tb progress::-webkit-progress-value { background: var(--tb-accent); }
+.tb progress::-moz-progress-bar { background: var(--tb-accent); }
+.tb meter::-webkit-meter-bar { block-size: 100%; background: var(--tb-bg); border: 0; }
+.tb meter::-webkit-meter-optimum-value { background: var(--tb-accent); }
+.tb meter::-webkit-meter-suboptimum-value { background: var(--tb-accent); }
+.tb meter::-webkit-meter-even-less-good-value { background: var(--tb-accent); }
+.tb meter::-moz-meter-bar { background: var(--tb-accent); }
+/* Inline text, code, pagination, breadcrumbs and extra input states. */
+.tb :where(code, kbd, samp, pre, var) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
+.tb :where(code, kbd, samp) { padding: 0.1rem 0.4rem; background: var(--tb-bg); border: 1px solid var(--tb-border-strong); border-radius: 0.3rem; }
+.tb kbd { border-block-end-width: 0.2rem; font-weight: 700; }
+.tb pre { padding: 0.75rem 1rem; overflow-x: auto; background: var(--tb-bg); border: 1px solid var(--tb-border-strong); border-radius: 0.5rem; }
+.tb pre code { padding: 0; background: none; border: 0; font-size: 1em; }
+.tb mark { padding: 0 0.3rem; color: var(--tb-on-accent); background: var(--tb-accent); border-radius: 0.2rem; }
+.tb ins { text-decoration: underline double; text-underline-offset: 0.2em; }
+.tb :where(del, s) { color: var(--tb-disabled); }
+.tb abbr[title] { text-decoration: underline dotted; text-underline-offset: 0.2em; }
+.tb small { font-size: 0.875rem; }
+.tb-list ul, .tb-list ol { margin-block-start: 0.25rem; padding-inline-start: 1.25rem; }
+.tb-crumbs, .tb-pager { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; list-style: none; }
+.tb-crumbs { font-size: 0.9375rem; }
+.tb-crumbs li + li::before { content: "/"; margin-inline-end: 0.5rem; color: var(--tb-muted); }
+.tb-pg { display: inline-flex; align-items: center; justify-content: center; min-inline-size: 2.5rem; min-block-size: 2.5rem; padding: 0 0.75rem; color: var(--tb-primary); background: var(--tb-bg); border: 1px solid var(--tb-border-strong); border-radius: 0.5rem; font-weight: 600; text-decoration: none; }
+.tb-pg[aria-current="page"] { color: var(--tb-on-primary); background: var(--tb-primary); border-color: var(--tb-primary); }
+.tb-input:disabled { color: var(--tb-disabled); background: transparent; border-style: dashed; }
+.tb-input[aria-invalid="true"] { border: 2px solid var(--tb-danger); }
+.tb-input::file-selector-button { margin-inline-end: 0.75rem; padding: 0.35rem 0.8rem; color: var(--tb-on-primary); background: var(--tb-primary); border: 0; border-radius: 0.35rem; font: inherit; font-weight: 700; }
+.tb-choice:has(:disabled) { color: var(--tb-disabled); }
+.tb-link--visited { color: var(--tb-visited); }
+.tb-err { color: var(--tb-danger); font-weight: 600; }
+.tb-msg { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.6rem 0.8rem; color: var(--c); background: var(--tb-bg); border: 1px solid var(--c); border-inline-start-width: 0.4rem; border-radius: 0.5rem; font-weight: 600; }
+.tb-msg--danger { --c: var(--tb-danger); } .tb-msg--success { --c: var(--tb-success); } .tb-msg--warning { --c: var(--tb-warning); }
+.tb-msg__i { flex: none; inline-size: 1.25rem; text-align: center; font-weight: 800; }
+.tb-ringwrap { display: inline-block; padding: 0.5rem; }
+.tb-ringwrap > * { outline: 3px solid var(--tb-focus); outline-offset: 2px; }
+.tb-ringwrap .tb-input { inline-size: 12rem; }
+.tb-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 1.5rem; padding: 1.25rem; background: var(--tb-surface); border-block-start: 1px solid var(--tb-border); font-size: 0.9375rem; }
+/* Selection ring: 2px white then 2px black, drawn outside the element so it never crosses text. Gaps on the page are wide enough that neighbouring rings do not touch.
+   Full-width bars and table cells draw it inside instead, where the page would clip it or the cells leave no room. */
+.tb [data-on], .tb[data-on] { outline: 0.125rem solid #000; outline-offset: 0.125rem; box-shadow: 0 0 0 0.125rem #fff; }
+.tb-nav[data-on], .tb-foot[data-on], .tb-table caption[data-on], .tb-table th[data-on], .tb-table td[data-on] { outline-offset: -0.25rem; box-shadow: inset 0 0 0 0.125rem #fff; }
+
+/* Library search */
+.libsearch { display: grid; gap: var(--s-2); }
+.libsearch__field { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
+.libsearch input[type="search"] { flex: 1 1 14rem; min-inline-size: 0; min-block-size: var(--target); padding: var(--s-2) var(--s-3); font: inherit; color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2); -webkit-appearance: none; appearance: none; }
+.libsearch input[type="search"]::-webkit-search-cancel-button { display: none; }
+.libsearch > * { margin: 0; }
+.libsearch__info { display: flex; align-items: center; gap: var(--s-2); }
+
+/* Tabs */
+.tiles { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; overflow: hidden; background: var(--surface-2); border: var(--rule) solid var(--line); border-radius: var(--r-2); }
+.tiles--lib { grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr)); }
+.tiles--recent { grid-template-columns: repeat(6, minmax(0, 1fr)); inline-size: min(100%, 30rem); }
+.tiles li { display: block; min-inline-size: 0; }
+/* Each group sits on its own fixed backdrop, whatever the theme: pure white or pure black. The padding and gaps let the backdrop show around every tile, so a colour never runs into the page surface. */
+#lib-white, #recent-white { background: #fff; background-color: #fff; }
+#lib-black, #recent-black { background: #000; background-color: #000; }
+#lib-white, #lib-black, #recent-white, #recent-black { padding: var(--s-2); gap: var(--s-1); forced-color-adjust: none; }
+#lib-white .tile, #lib-black .tile, #recent-white .tile, #recent-black .tile { border-radius: var(--r-1); }
+.tile { display: block; inline-size: 100%; block-size: auto; min-block-size: 0; min-inline-size: 0; aspect-ratio: 2 / 3; padding: 0; border: 0; border-radius: 0; background: var(--tile, #808080); cursor: pointer; forced-color-adjust: none; }
+.tile:hover:not(:disabled) { background: var(--tile, #808080); box-shadow: inset 0 0 0 0.1875rem #fff, inset 0 0 0 0.375rem #000; }
+.tile:focus-visible { outline: none; border-radius: 0; box-shadow: inset 0 0 0 0.3125rem #fff, inset 0 0 0 0.625rem #000; }
+@media (forced-colors: active) {
+  .tile { border: 1px solid CanvasText; }
+  .tile:focus-visible { outline: 0.25rem solid Highlight; outline-offset: -0.25rem; }
+}
+.empty { text-align: start; display: grid; gap: var(--s-4); justify-items: start; }
+.veto-list { list-style: none; padding: 0; display: grid; gap: var(--s-2); }
+.veto-list li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); }
+.veto-list code { overflow-wrap: anywhere; }
+
+/* Colour tiles: 2:3, no gaps, no visible text. The fill is the colour as it appears on its backdrop.
+   The focus and hover ring is white over black, so at least one of the two always contrasts with the fill. */
+.explorer { inline-size: 100%; max-inline-size: none; block-size: 100vh; block-size: 100dvh; max-block-size: none; margin: 0; padding: 0; border: 0; background: var(--paper); color: var(--ink); }
+.explorer[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.explorer::backdrop { background: var(--paper); }
+.explorer__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); padding: var(--s-3) var(--s-4); border-block-end: var(--rule) solid var(--line-soft); }
+.explorer__bar h2 { font-size: var(--t-md); }
+.explorer__bar p { margin: 0; }
+.explorer__stage { display: flex; flex-direction: column; padding: var(--s-4); overflow: hidden; scroll-padding-block: var(--s-2); }
+.explorer__stage[data-scroll="on"] { overflow-x: hidden; overflow-y: auto; }
+.explorer__slot { display: flex; flex: 1 0 auto; min-inline-size: 0; }
+.explorer__foot { display: grid; gap: var(--s-2); justify-items: center; padding: var(--s-3) var(--s-4) var(--s-4); border-block-start: var(--rule) solid var(--line-soft); }
+.explorer__actions { display: flex; gap: var(--s-3); inline-size: 100%; max-inline-size: 26rem; }
+.explorer__actions button { flex: 1 1 0; }
+.explorer__foot .hint, .explorer__foot p { margin: 0; text-align: center; }
+.explorer__foot [role="status"], .explorer__foot #ex-status { min-block-size: 1.4em; }
+
+/* Explorer: a full-screen modal dialog */
+@media (height <= 30rem) {
+  .explorer[open] { display: block; overflow-y: auto; }
+  .explorer__stage, .explorer__stage[data-scroll] { overflow: visible; }
+}
+.ccard { container: ccard / inline-size; position: relative; display: flex; flex-direction: column; inline-size: 100%; max-inline-size: 26rem; margin: auto; overflow: hidden; background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-3); box-shadow: 0 0.4rem 0 -0.15rem var(--line-soft), 0 0.8rem 0 -0.3rem var(--line-soft); touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; transform-origin: 50% 100%; }
+.ccard.is-dragging { cursor: grabbing; }
+.ccard.is-settling { transition: transform var(--settle) ease-out; }
+.ccard .sw { flex: 1 1 auto; min-block-size: 6rem; border-width: 0 0 var(--rule) 0; border-radius: 0; }
+.ccard .sw__fill { min-block-size: 6rem; }
+.ccard__body { display: grid; gap: var(--s-2); padding: var(--s-4); }
+.ccard__body > * { margin: 0; }
+.ccard__body h3 { font-size: var(--t-lg); }
+.ccard__badges { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+
+/* Very short viewports (400% zoom, landscape phones): the whole dialog scrolls instead of squeezing the stage to nothing. */
+.ccard--static { cursor: default; touch-action: auto; user-select: text; -webkit-user-select: text; }
+@container ccard (inline-size < 20rem) {
+  .codes { grid-template-columns: minmax(0, 1fr); }
+  .codes dd { margin-block-end: var(--s-2); }
+}
+
+/* A card shown for reference (library viewer): same look as the explorer card, but it does not swipe. */
+
+/* Preview accordion: the colour used as ordinary page elements on its own backdrop (white or black). */
+.pv-box { flex: none; inline-size: 100%; max-inline-size: 26rem; margin: var(--s-3) auto 0; }
+@media (height <= 46rem) {
+  .explorer__stage { padding-block: var(--s-3); }
+  .ccard .sw, .ccard .sw__fill { min-block-size: 4.5rem; }
+  .ccard .sw__text { gap: 0; padding: var(--s-2); }
+  .ccard .sw__aa { font-size: 1.75rem; }
+  .ccard__body { gap: var(--s-1); padding: var(--s-3); }
+  .pv-box { margin-block-start: var(--s-2); }
+}
+.pv { --pv-bg: #fff; --pv-fg: #000; color-scheme: light; padding: var(--pad-card); color: var(--pv-fg); background: var(--pv-bg); border: var(--rule) solid var(--line); border-radius: var(--r-3); forced-color-adjust: none;
+  /* The preview backdrop is pinned to pure white or pure black and sealed from the page theme: fixed border, no blending, and no theme colour on hover or focus. */
+  isolation: isolate; mix-blend-mode: normal; opacity: 1; filter: none; border-color: #8a8a8a; background-image: none; }
+.pv[data-bg="black"] { color-scheme: dark; }
+.pv[data-bg="white"] { --pv-bg: #fff; background-color: #fff; }
+.pv[data-bg="black"] { --pv-bg: #000; background-color: #000; }
+.pv .pv__btn, .pv .pv__btn:hover:not(:disabled) { color: var(--pv-bg); background: var(--pv-fg); border-color: var(--pv-fg); }
+.pv .pv__btn--outline, .pv .pv__btn--outline:hover:not(:disabled) { color: var(--pv-fg); background: var(--pv-bg); border-color: var(--pv-fg); }
+.pv *:focus-visible { outline-color: var(--pv-fg); }
+.pv.is-pending { visibility: hidden; }
+.pv__inner { display: grid; gap: var(--s-4); }
+.pv__inner > * { min-inline-size: 0; margin: 0; }
+.pv__inner h1, .pv__inner h2, .pv__inner h3, .pv__inner h4, .pv__inner p, .pv__inner label, .pv__inner a { color: var(--pv-fg); }
+.pv__inner a { text-decoration: underline; text-decoration-thickness: 0.09em; text-underline-offset: 0.18em; }
+.pv__card { display: grid; gap: var(--s-2); padding: var(--s-4); background: var(--pv-bg); border: var(--rule) solid var(--pv-fg); border-radius: var(--r-3); }
+.pv__card > * { margin: 0; }
+.pv__row { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.pv__btn { color: var(--pv-bg); background: var(--pv-fg); border: var(--rule) solid var(--pv-fg); }
+.pv__btn--outline { color: var(--pv-fg); background: var(--pv-bg); }
+.pv__field { display: grid; gap: var(--s-1); }
+.pv__field label { font-weight: 700; }
+.pv__select { position: relative; display: block; }
+.pv__select select { -webkit-appearance: none; appearance: none; inline-size: 100%; min-block-size: var(--target); padding: var(--s-2) 2.75rem var(--s-2) var(--s-3); font: inherit; color: var(--pv-fg); background: var(--pv-bg); border: var(--rule) solid var(--pv-fg); border-radius: var(--r-2); }
+.pv__select option { color: var(--pv-fg); background: var(--pv-bg); }
+.pv__select::after { content: ""; position: absolute; inset-block: 0; inset-inline-end: var(--s-3); inline-size: 1.25rem; block-size: 1.25rem; margin-block: auto; background: var(--pv-fg); mask: var(--mask-chev) center / contain no-repeat; -webkit-mask: var(--mask-chev) center / contain no-repeat; transform: rotate(90deg); pointer-events: none; }
+.stamp { position: absolute; inset-block-start: var(--s-4); z-index: 2; display: inline-flex; align-items: center; gap: var(--s-2); padding: var(--s-1) var(--s-3); border: var(--rule) solid currentColor; border-radius: var(--r-2); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; pointer-events: none; }
+.stamp::before { content: ""; inline-size: 1.25rem; block-size: 1.25rem; background: currentColor; mask: var(--mask-ok) center / contain no-repeat; -webkit-mask: var(--mask-ok) center / contain no-repeat; }
+.stamp--keep { left: var(--s-4); rotate: -8deg; color: var(--ok-ink); background: var(--ok-tint); opacity: var(--keep-o, 0); }
+.stamp--veto { right: var(--s-4); rotate: 8deg; color: var(--problem-ink); background: var(--problem-tint); opacity: var(--veto-o, 0); }
+.stamp--veto::before { mask-image: var(--mask-problem); -webkit-mask-image: var(--mask-problem); }
+@media (forced-colors: active) {
+  .stamp::before { forced-color-adjust: none; background-color: CanvasText; }
+}
+
+/* On short screens the card is tightened so the card and the accordion heading fit without scrolling. */
+@media (width >= 40rem) {
+  main, .wrap { padding-inline: var(--s-5); }
+  .tbpop { inline-size: min(26rem, calc(100vw - 4rem)); max-block-size: min(36rem, 80dvh); }
+  .tbpop .tbpop__tiles { grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr)); }
+}
+@media (width >= 48rem) {
+  .tiles--lib { grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); }
+  .explorer__bar, .explorer__stage, .explorer__foot { padding-inline: var(--s-5); }
+}
+@media (width >= 64rem) {
+  #panel-home { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); align-items: start; }
+  #panel-home > * { min-inline-size: 0; margin-block-start: 0; }
+  #panel-home > .span-all { grid-column: 1 / -1; }
+  .explorer__stage { flex-direction: row; align-items: center; justify-content: center; gap: var(--s-6); }
+  .explorer__slot { flex: 0 1 26rem; }
+  .pv-box { flex: 0 1 26rem; margin: 0; align-self: flex-start; }
+}
+@media (width >= 80rem) {
+  :root { --measure: 80rem; }
+}
+@media (width >= 96rem) {
+  :root { --measure: 90rem; }
+  .tiles--lib { grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); }
+}
+
+/* Breakpoints (Tailwind v4, mobile-first): sm 40rem, md 48rem, lg 64rem, xl 80rem, 2xl 96rem.
+   Media queries cannot read custom properties, so these literals are repeated; this legend is the single reference.
+   Media queries shape the page; container queries (.ccard) shape the reusable card. */
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+  .ccard.is-settling { transition: none; }
+}
+html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-motion="paused"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+@media (forced-colors: active) {
+  .note::before, [role="alert"]:not([hidden])::before, .badge::before, summary::before { forced-color-adjust: none; background-color: CanvasText; }
+  .panel { border-color: CanvasText; }
+  .note { border-inline-start-width: 0.5rem; }
+
+  /* Mask icons are painted with background-color, which forced colours overrides: pin them to system ink. */
+}
+@media print {
+  :root { color-scheme: light; }
+  .site-footer, .skip-link, .no-print { display: none; }
+  body { background: #fff; }
+  /* Swatches are background colour, which browsers strip unless told otherwise. */
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; overflow-wrap: anywhere; }
+}
+
+/* 6. User preferences and assistive modes */
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<main id="main" tabindex="-1">
+  <header class="site-header">
+    <h1>Dathanna</h1>
+    <p id="save-error" role="alert" hidden></p>
+    <p class="lede">Swipe through random colours. Every one passes WCAG AA contrast, comes with its closest name, and is yours to keep or veto.</p>
+    <div class="row no-print">
+      <button type="button" data-open-explorer>Explore the colours</button>
+      <button id="theme-toggle" type="button" class="secondary">Theme: Auto</button>
+      <button id="motion-toggle" type="button" class="secondary" aria-pressed="false">Pause motion</button>
+    </div>
+  </header>
+
+  <noscript><p role="alert">Dathanna needs JavaScript. Enable it and reload.</p></noscript>
+
+  <div class="stack-lg">
+
+    <div class="no-print">
+      <div class="tablist" role="tablist" aria-label="Sections">
+        <button id="tab-home" type="button" role="tab" aria-selected="true" aria-controls="panel-home">Explore</button>
+        <button id="tab-lib" type="button" role="tab" aria-selected="false" aria-controls="panel-lib" tabindex="-1">Library <span id="tab-count"></span></button>
+        <button id="tab-theme" type="button" role="tab" aria-selected="false" aria-controls="panel-theme" tabindex="-1">Theme Builder</button>
+      </div>
+    </div>
+
+    <p id="lib-status" role="status"></p>
+    <p id="lib-error" role="alert" hidden></p>
+
+    <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" class="stack-lg">
+
+    <section class="panel" aria-labelledby="recent-heading">
+      <h2 id="recent-heading" tabindex="-1">Recently added</h2>
+
+      <div id="recent-empty" class="empty">
+        <p>Nothing kept yet. Start exploring to find colours worth keeping. Swipe right to keep one, left to veto it for good.</p>
+        <button type="button" data-open-explorer>Explore the colours</button>
+      </div>
+
+      <div id="recent-full" class="stack" hidden>
+        <div class="stack">
+          <h3 id="recent-white-h">On white <span id="recent-white-n" class="hint"></span></h3>
+          <ul id="recent-white" class="tiles tiles--recent" aria-labelledby="recent-white-h" hidden></ul>
+          <p id="recent-white-empty" class="hint">Nothing kept on white yet.</p>
+        </div>
+        <div class="stack">
+          <h3 id="recent-black-h">On black <span id="recent-black-n" class="hint"></span></h3>
+          <ul id="recent-black" class="tiles tiles--recent" aria-labelledby="recent-black-h" hidden></ul>
+          <p id="recent-black-empty" class="hint">Nothing kept on black yet.</p>
+        </div>
+        <div class="row">
+          <button type="button" data-open-explorer>Explore more</button>
+          <button id="view-library" type="button" class="secondary">Open the library</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="set-heading">
+      <h2 id="set-heading">Explore settings</h2>
+      <fieldset class="stack">
+        <legend>Check contrast against</legend>
+        <label class="checkline" for="bg-white"><input type="radio" name="bg" id="bg-white" value="white"> White (#FFFFFF), for colours used on light pages</label>
+        <label class="checkline" for="bg-black"><input type="radio" name="bg" id="bg-black" value="black"> Black (#000000), for colours used on dark pages</label>
+        <p class="hint">Each colour is fully opaque and must reach 4.5:1 against the backdrop. That is the AA minimum for text in both WCAG 2.1 and 2.2 (success criterion 1.4.3), and it also clears the 3:1 needed for icons and control edges.</p>
+      </fieldset>
+      <label class="checkline" for="opt-safe"><input type="checkbox" id="opt-safe"> Web-safe channel values only (red, green and blue each use 0, 51, 102, 153, 204 or 255)</label>
+      <label class="checkline" for="opt-online"><input type="checkbox" id="opt-online"> Look up colour names online</label>
+      <p class="hint">Off by default. When on, the colour you see is sent as a hex code to the Color Name API (api.color.pizza), which matches it against about 32,000 names. Like any web request, this also shares your IP address with that service. Nothing else is sent. When off, or when the lookup fails, Dathanna uses a built-in list of CSS colour names.</p>
+      <p id="names-status" role="status"></p>
+      <p class="hint">Changes apply to the next colour you see.</p>
+    </section>
+
+    <section class="stack span-all" aria-labelledby="veto-heading">
+      <h2 id="veto-heading">Vetoed colours <span id="veto-count" class="hint"></span></h2>
+      <details id="veto-box">
+        <summary>Show or hide vetoed colours</summary>
+        <p class="hint">A veto belongs to the backdrop it was made on. That colour, and any that look almost the same on that backdrop, will not come back there. It can still appear on the other backdrop.</p>
+        <ul id="veto-list" class="veto-list"></ul>
+        <p id="veto-empty">Nothing vetoed yet.</p>
+        <div class="row"><button id="veto-clear" type="button" class="secondary">Clear all vetoes</button></div>
+        <p id="veto-status" role="status"></p>
+      </details>
+    </section>
+
+    <section class="stack span-all about" aria-labelledby="about-heading">
+      <h2 id="about-heading">About Dathanna</h2>
+      <p>Dathanna is a small colour explorer by Nuadyr. It picks fully opaque red, green and blue values at random using your browser’s secure random source, keeps only the ones that pass AA contrast, and names each with its closest CSS colour name. Online lookup of richer names is optional and off by default.</p>
+      <p>Prefer not to swipe? Every card has Keep and Veto buttons, and the left and right arrow keys work too. Your library and vetoes are saved only in this browser. The only thing that leaves it is the hex code of a colour being named, and only while online names are on.</p>
+    </section>
+
+    </div>
+
+    <section id="panel-lib" role="tabpanel" aria-labelledby="tab-lib" class="panel" hidden>
+      <h2 id="lib-heading" tabindex="-1">Library <span id="lib-count" class="hint"></span></h2>
+
+      <div id="lib-empty" class="empty">
+        <p>Your library is empty. Start exploring to find colours worth keeping. Swipe right to keep one, left to veto it for good.</p>
+        <button type="button" data-open-explorer>Explore the colours</button>
+      </div>
+
+      <div id="lib-full" class="stack" hidden>
+        <p class="hint">Colours are filed under the backdrop they were kept on. A colour kept on white can still be offered again on black, and the other way round. Select a colour to see its details.</p>
+        <div class="libsearch no-print">
+          <label for="lib-q"><strong>Search the library by colour</strong></label>
+          <div class="libsearch__field">
+            <input id="lib-q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="white, light blue, ff8800" aria-describedby="lib-q-hint lib-q-status">
+            <button id="lib-q-clear" type="button" class="secondary" hidden>Clear search</button>
+          </div>
+          <p id="lib-q-hint" class="hint">Type a colour name (rough spelling is fine) or a hex code. Your search becomes a hex code, and the 30 nearest kept colours are shown on white and again on black. Every kept colour is checked on both, wherever you kept it. Clear the box to see the whole library again.</p>
+          <p id="lib-q-status" class="libsearch__info" role="status"></p>
+        </div>
+        <div class="row">
+          <button type="button" data-open-explorer>Explore more</button>
+          <button id="lib-css" type="button" class="secondary">Copy all as CSS</button>
+          <button id="lib-clear" type="button" class="secondary">Clear library</button>
+        </div>
+        <div class="stack">
+          <h3 id="lib-white-h">On white <span id="lib-white-n" class="hint"></span></h3>
+          <ul id="lib-white" class="tiles tiles--lib" aria-labelledby="lib-white-h" hidden></ul>
+          <p id="lib-white-empty" class="hint">Nothing kept on white yet.</p>
+        </div>
+        <div class="stack">
+          <h3 id="lib-black-h">On black <span id="lib-black-n" class="hint"></span></h3>
+          <ul id="lib-black" class="tiles tiles--lib" aria-labelledby="lib-black-h" hidden></ul>
+          <p id="lib-black-empty" class="hint">Nothing kept on black yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-theme" role="tabpanel" aria-labelledby="tab-theme" class="panel" hidden>
+      <h2 id="theme-heading" tabindex="-1">Theme Builder</h2>
+      <p class="hint">Select a CSS variable above the preview, or tap a part of the preview, then pick a colour for it from your library. Every variable except the page background also has an opacity slider in the picker. Checks use WCAG AA, and a translucent colour is checked as it looks over the page or card behind it. Disabled controls are exempt from contrast rules, so only placeholder and struck-through text are checked.</p>
+      <div class="tb-layout">
+        <div class="tb-controls stack">
+          <div class="stack"><h3>Contrast checks</h3><p id="tb-summary" class="hint"></p><ul id="tb-checks" class="tb-checks"></ul></div>
+          <div class="row"><button id="tb-copy" type="button">Copy as CSS</button></div>
+          <p id="tb-status" role="status"></p>
+        </div>
+        <div class="tb-main">
+          <div class="row">
+            <button id="tb-light" type="button" class="secondary">Light preset</button>
+            <button id="tb-dark" type="button" class="secondary">Dark preset</button>
+            <button id="tb-swap" type="button" class="secondary">Swap page and text</button>
+          </div>
+          <p id="tb-mode" class="hint"></p>
+          <div class="tb-vars">
+            <h3 id="tb-vars-h">CSS variables</h3>
+            <div id="tb-roles" class="tb-roles" role="group" aria-labelledby="tb-vars-h"></div>
+          </div>
+        <div id="tb" class="tb" data-role="bg" role="img" aria-label="Preview of a web page using the theme">
+          <header class="tb-nav" data-role="surface" role="none">
+            <span class="tb-logo" data-role="text">Northwind</span>
+            <nav class="tb-navbar" aria-label="Preview navigation"><ul class="tb-links"><li><a class="tb-link" data-role="primary" href="#tb">Products</a></li><li><a class="tb-link" data-role="primary" href="#tb">Pricing</a></li><li><a class="tb-link" data-role="primary" href="#tb">Docs</a></li></ul></nav>
+            <search class="tb-search"><label class="visually-hidden" for="tb-site-q">Search the site</label><input id="tb-site-q" class="tb-input" data-role="bg" type="search" placeholder="Search" readonly><button class="tb-btn" data-role="primary" data-text-role="onPrimary" type="button">Search</button></search>
+          </header>
+          <div class="tb-page">
+            <section class="tb-hero">
+              <span class="tb-badge" data-role="accent" data-text-role="onAccent">New release</span>
+              <p class="tb-h1" data-role="text">Build pages people love to read</p>
+              <p class="tb-m" data-role="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+              <div class="tb-row"><button class="tb-btn" data-role="primary" data-text-role="onPrimary" type="button">Get started</button><button class="tb-btn tb-btn--o" data-role="primary" type="button">Learn more</button><button class="tb-btn" data-role="disabled" type="button" disabled>Unavailable</button></div>
+            </section>
+            <hr class="tb-hr" data-role="border">
+            <section class="tb-sec">
+              <p class="tb-h2" data-role="text">Features</p>
+              <div class="tb-grid">
+                <article class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Fast setup</p><p class="tb-m" data-role="muted">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p><a class="tb-link" data-role="primary" href="#tb">Read more</a></article>
+                <article class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Accessible</p><p class="tb-m" data-role="muted">Duis aute irure dolor in reprehenderit in voluptate velit esse.</p><a class="tb-link" data-role="primary" href="#tb">Read more</a></article>
+                <article class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Made to scale</p><p class="tb-m" data-role="muted">Excepteur sint occaecat cupidatat non proident, sunt in culpa.</p><a class="tb-link" data-role="primary" href="#tb">Read more</a></article>
+              </div>
+            </section>
+            <section class="tb-sec tb-two">
+              <figure class="tb-fig"><img id="tb-img" class="tb-img" data-role="surface" width="320" height="180" alt="Sample picture of hills and a sun" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'%3E%3C/svg%3E"><figcaption class="tb-cap tb-m" data-role="muted">Figure 1. A sample picture.</figcaption></figure>
+              <figure class="tb-fig"><canvas id="tb-canvas" class="tb-canvas" data-role="surface" width="960" height="320">A sample bar chart.</canvas><figcaption class="tb-cap tb-m" data-role="muted">Figure 2. A sample chart.</figcaption></figure>
+            </section>
+            <section class="tb-sec tb-two">
+              <article class="tb-card tb-prose" data-role="surface">
+                <p class="tb-h3" data-role="text">Colour you can read</p>
+                <p class="tb-m" data-role="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <p class="tb-m" data-role="muted">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+              </article>
+              <figure class="tb-quotefig">
+                <blockquote class="tb-quote" data-role="text"><p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p></blockquote>
+                <figcaption class="tb-cap tb-m" data-role="muted">A sample author, <cite>Sample Book</cite></figcaption>
+              </figure>
+            </section>
+            <section class="tb-sec tb-two">
+              <div class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Unordered list</p><ul class="tb-list" data-role="text"><li>Lorem ipsum dolor</li><li>Sit amet consectetur<ul><li>Nested item</li><li>Another nested item</li></ul></li><li>Adipiscing elit</li></ul></div>
+              <div class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Ordered list</p><ol class="tb-list" data-role="text"><li>Choose a colour</li><li>Check the contrast<ol><li>Text</li><li>Controls</li></ol></li><li>Copy the CSS</li></ol></div>
+              <div class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Menu</p><menu class="tb-menu"><li><button class="tb-btn tb-btn--o" data-role="primary" type="button">Copy</button></li><li><button class="tb-btn tb-btn--o" data-role="primary" type="button">Paste</button></li><li><button class="tb-btn tb-btn--o" data-role="primary" type="button">Undo</button></li></menu></div>
+              <div class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Definitions</p><dl class="tb-dl"><div><dt data-role="text">Contrast</dt><dd class="tb-m" data-role="muted">The difference in light between two colours.</dd></div><div><dt data-role="text">Opacity</dt><dd class="tb-m" data-role="muted">How much of the backdrop shows through.</dd></div></dl></div>
+            </section>
+            <section class="tb-sec tb-two">
+              <div>
+                <details class="tb-details" data-role="surface" open><summary data-role="text">What does AA mean?</summary><p class="tb-m" data-role="muted">It is the middle conformance level of WCAG: 4.5:1 for normal text and 3:1 for large text and interface parts.</p></details>
+                <details class="tb-details" data-role="surface"><summary data-role="text">Can I change it later?</summary><p class="tb-m" data-role="muted">Yes. Pick any variable again and choose another colour.</p></details>
+              </div>
+              <div class="tb-card" data-role="surface">
+                <aside class="tb-alert" role="note" data-role="surface"><p class="tb-h3" data-role="text">Heads up</p><p class="tb-m" data-role="muted">Sed ut perspiciatis unde omnis iste natus error sit voluptatem.</p><a class="tb-link" data-role="primary" href="#tb">Dismiss</a></aside>
+                <dialog class="tb-dialog" open data-role="surface" aria-label="Example dialog"><p class="tb-h3" data-role="text">Save your changes?</p><p class="tb-m" data-role="muted">Your theme has not been copied yet.</p><div class="tb-row"><button class="tb-btn" data-role="primary" data-text-role="onPrimary" type="button">Save</button><button class="tb-btn tb-btn--o" data-role="primary" type="button">Cancel</button></div></dialog>
+              </div>
+            </section>
+            <section class="tb-sec tb-two">
+              <article class="tb-card" data-role="surface">
+                <p class="tb-h3" data-role="text">Inline text</p>
+                <p data-role="text"><strong>Bold</strong>, <em>italic</em>, a <a class="tb-link" data-role="primary" href="#tb">link</a>, <a class="tb-link tb-link--visited" data-role="visited" href="#tb">visited</a>, <mark data-role="accent" data-text-role="onAccent">highlighted</mark>, <code data-role="bg">code</code>, <kbd data-role="bg">Ctrl</kbd> + <kbd data-role="bg">C</kbd>, <abbr title="Web Content Accessibility Guidelines">WCAG</abbr>, <time datetime="2026-10-22">22 Oct 2026</time>, H<sub>2</sub>O, x<sup>2</sup>, <ins>added</ins>, <del data-role="disabled">removed</del>, <s data-role="disabled">struck</s>, <q>quoted</q>, <var>n</var>, <samp data-role="bg">output</samp> and <small data-role="muted">small print</small>.</p>
+                <pre data-role="bg"><code>:root { --color-primary: #1d4ed8; }</code></pre>
+              </article>
+              <div class="tb-card" data-role="surface">
+                <p class="tb-h3" data-role="text">Navigation</p>
+                <nav aria-label="Breadcrumb"><ol class="tb-crumbs"><li><a class="tb-link" data-role="primary" href="#tb">Home</a></li><li><a class="tb-link" data-role="primary" href="#tb">Docs</a></li><li><span aria-current="page" data-role="muted">Themes</span></li></ol></nav>
+                <nav aria-label="Pagination"><ul class="tb-pager"><li><a class="tb-pg" data-role="primary" href="#tb">Prev</a></li><li><a class="tb-pg" data-role="primary" href="#tb">1</a></li><li><a class="tb-pg" data-role="primary" data-text-role="onPrimary" href="#tb" aria-current="page">2</a></li><li><a class="tb-pg" data-role="primary" href="#tb">3</a></li><li><a class="tb-pg" data-role="primary" href="#tb">Next</a></li></ul></nav>
+              </div>
+            </section>
+            <section class="tb-sec">
+              <div class="tb-tablewrap">
+                <table class="tb-table">
+                  <caption data-role="muted">Plans and pricing</caption>
+                  <colgroup><col class="tb-col-wide"><col><col></colgroup>
+                  <thead><tr><th scope="col" data-role="text">Plan</th><th scope="col" data-role="text">Seats</th><th scope="col" data-role="text">Price</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row" data-role="text">Starter</th><td data-role="text">5</td><td data-role="text">$9</td></tr>
+                    <tr><th scope="row" data-role="text">Team</th><td data-role="text">25</td><td data-role="text">$29</td></tr>
+                    <tr><th scope="row" data-role="text">Company</th><td data-role="text">100</td><td data-role="text">$99</td></tr>
+                  </tbody>
+                  <tfoot><tr><th scope="row" data-role="text">All plans</th><td data-role="text">130</td><td data-role="text">$137</td></tr></tfoot>
+                </table>
+              </div>
+            </section>
+            <section class="tb-sec tb-two">
+              <fieldset class="tb-card tb-fieldset" data-role="surface">
+                <legend class="tb-h3" data-role="text">Contact us</legend>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-email">Email address</label><input id="tb-email" class="tb-input" data-role="bg" type="email" value="name@example.com" readonly></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-msg">Message</label><textarea id="tb-msg" class="tb-input" data-role="bg" rows="3" placeholder="Write your message" readonly></textarea></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-plan">Plan</label><select id="tb-plan" class="tb-input" data-role="bg"><option>Starter</option><option selected>Team</option><option>Company</option></select></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-city">Nearest office</label><input id="tb-city" class="tb-input" data-role="bg" list="tb-cities" placeholder="Start typing a city" readonly><datalist id="tb-cities"><option value="Kyoto"></option><option value="Lima"></option><option value="Oslo"></option></datalist></div>
+                <div class="tb-choices"><label class="tb-choice" data-role="text"><input type="checkbox" data-role="primary" checked>Send me updates</label><label class="tb-choice" data-role="text"><input type="radio" data-role="primary" name="tb-reply" checked>By email</label><label class="tb-choice" data-role="text"><input type="radio" name="tb-reply">By phone</label></div>
+                <button class="tb-btn" data-role="primary" data-text-role="onPrimary" type="button">Send message</button>
+              </fieldset>
+              <div class="tb-card" data-role="surface">
+                <p class="tb-h3" data-role="text">Controls</p>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-extras">Extras</label><select id="tb-extras" class="tb-input tb-listbox" data-role="bg" multiple size="4"><optgroup label="Support"><option>Email</option><option selected>Chat</option></optgroup><optgroup label="Training"><option>Workshop</option><option selected>Webinar</option></optgroup></select></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-range">Volume</label><div class="tb-inline"><input id="tb-range" data-role="primary" type="range" min="0" max="100" value="60"><output class="tb-out" data-role="text" for="tb-range">60</output></div></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-meter">Storage used</label><meter id="tb-meter" data-role="accent" min="0" max="100" value="70">70%</meter></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-prog">Upload</label><progress id="tb-prog" data-role="accent" max="100" value="45">45%</progress></div>
+              </div>
+            </section>
+            <section class="tb-sec tb-two">
+              <div class="tb-card" data-role="surface">
+                <p class="tb-h3" data-role="text">Input types</p>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-pw">Password</label><input id="tb-pw" class="tb-input" data-role="bg" type="password" value="secret123" readonly></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-num">Quantity</label><input id="tb-num" class="tb-input" data-role="bg" type="number" value="3" readonly></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-date">Date</label><input id="tb-date" class="tb-input" data-role="bg" type="date" value="2026-10-22" readonly></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-file">Attachment</label><input id="tb-file" class="tb-input" data-role="bg" type="file"></div>
+              </div>
+              <div class="tb-card" data-role="surface">
+                <p class="tb-h3" data-role="text">Input states</p>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-bad">Email address</label><input id="tb-bad" class="tb-input" data-role="bg" type="email" value="name@" aria-invalid="true" aria-describedby="tb-bad-msg" readonly><p id="tb-bad-msg" class="tb-err" data-role="danger">Enter a valid email address.</p></div>
+                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-off">Disabled field</label><input id="tb-off" class="tb-input" data-role="disabled" value="Not editable" disabled></div>
+                <div class="tb-choices"><label class="tb-choice" data-role="disabled"><input type="checkbox" disabled>Disabled checkbox</label><label class="tb-choice" data-role="disabled"><input type="radio" disabled>Disabled radio</label></div>
+              </div>
+            </section>
+            <section class="tb-sec tb-two">
+              <div class="tb-card" data-role="surface">
+                <p class="tb-h3" data-role="text">Status messages</p>
+                <p class="tb-msg tb-msg--danger" data-role="danger"><span class="tb-msg__i" aria-hidden="true">&#10005;</span>Payment failed. Check the card number.</p>
+                <p class="tb-msg tb-msg--success" data-role="success"><span class="tb-msg__i" aria-hidden="true">&#10003;</span>Your changes were saved.</p>
+                <p class="tb-msg tb-msg--warning" data-role="warning"><span class="tb-msg__i" aria-hidden="true">!</span>Your plan renews in 3 days.</p>
+              </div>
+              <div class="tb-card" data-role="surface">
+                <p class="tb-h3" data-role="text">Keyboard focus</p>
+                <div class="tb-row"><span class="tb-ringwrap" data-role="focus"><button class="tb-btn" type="button">Focused button</button></span><span class="tb-ringwrap" data-role="focus"><input class="tb-input" type="text" value="Focused field" aria-label="Focused field" readonly></span></div>
+              </div>
+            </section>
+          </div>
+          <hr class="tb-hr" data-role="border">
+          <footer class="tb-foot" data-role="surface" role="none">
+            <address class="tb-addr tb-m" data-role="muted">Northwind Ltd<br>12 Example Street, Sampletown<br><a class="tb-link" data-role="primary" href="#tb">hello@example.com</a></address>
+            <span data-role="muted">© 2026 Northwind. Lorem ipsum dolor sit amet.</span>
+            <ul class="tb-links"><li><a class="tb-link" data-role="primary" href="#tb">Privacy</a></li><li><a class="tb-link" data-role="primary" href="#tb">Terms</a></li></ul>
+          </footer>
+        </div>
+        <details>
+          <summary>Elements in the preview</summary>
+          <p class="hint">The preview uses real header, nav, search, section, article, aside, address, blockquote, figure, figcaption, details, summary, dialog, ul, ol, menu, li, dl, dt, dd, table, caption, colgroup, col, thead, tbody, tfoot, tr, th, td, fieldset, legend, label, input, textarea, select, optgroup, option, datalist, button, meter, progress, output, hr, img, canvas and footer elements, plus status messages, a focus ring, a visited link, inline text (strong, em, mark, code, kbd, samp, var, abbr, time, sub, sup, ins, del, s, q, small, pre), nested lists, breadcrumb and pagination navigation, and password, number, date and file inputs with invalid and disabled states. The preview frame stands in for body, and a plain div stands in for main, because this page already has its own main. A datalist has no box of its own and its suggestions are drawn by the browser, so the preview includes the input that uses it but cannot show or theme the list. The look of an open select and of the selected option in a list box is partly up to the browser. The picture and the chart are redrawn in your theme colours.</p>
+        </details>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<dialog id="explorer" class="explorer" aria-labelledby="ex-title">
+  <div class="explorer__bar">
+    <div>
+      <h2 id="ex-title" tabindex="-1">Explore the colours</h2>
+      <p id="ex-count" class="hint">Kept 0, vetoed 0</p>
+    </div>
+    <button id="ex-close" type="button" class="secondary">Done</button>
+  </div>
+  <div id="ex-stage" class="explorer__stage" data-scroll="off">
+    <div id="ex-slot" class="explorer__slot"></div>
+    <details id="ex-preview" class="pv-box" hidden>
+      <summary id="pv-title">Preview on white</summary>
+      <p id="pv-hint" class="hint"></p>
+      <div id="pv" class="pv" role="img" data-bg="white">
+        <div class="pv__inner" inert>
+          <h1>Heading 1</h1>
+          <h2>Heading 2</h2>
+          <h3>Heading 3</h3>
+          <h4>Heading 4</h4>
+          <div class="pv__card">
+            <h3>Card title</h3>
+            <p>A card holds a short note. It uses the colour for its border and text. <a href="#pv">This is a link.</a></p>
+          </div>
+          <div class="pv__row">
+            <button type="button" class="pv__btn">Button</button>
+            <button type="button" class="pv__btn pv__btn--outline">Outline button</button>
+          </div>
+          <div class="pv__field">
+            <label for="pv-select">Dropdown</label>
+            <span class="pv__select">
+              <select id="pv-select">
+                <option>Option one</option>
+                <option>Option two</option>
+                <option>Option three</option>
+              </select>
+            </span>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
+  <div class="explorer__foot">
+    <p id="ex-status" class="hint"></p>
+    <p id="ex-save-error" role="alert" hidden></p>
+    <div id="ex-actions" class="explorer__actions">
+      <button id="ex-veto" type="button" class="secondary" aria-keyshortcuts="ArrowLeft">Veto (left)</button>
+      <button id="ex-undo" type="button" class="secondary" disabled>Undo</button>
+      <button id="ex-keep" type="button" aria-keyshortcuts="ArrowRight">Keep (right)</button>
+    </div>
+    <div id="ex-view-actions" class="explorer__actions" hidden>
+      <button id="view-copy-hex" type="button" class="secondary">Copy hex</button>
+      <button id="view-copy-rgba" type="button" class="secondary">Copy RGBA</button>
+      <button id="view-remove" type="button" class="secondary">Remove</button>
+    </div>
+    <p id="ex-help" class="hint">Swipe or drag the card right to keep, left to veto. Or use the buttons or arrow keys.</p>
+    <p id="ex-live" class="visually-hidden" role="status"></p>
+  </div>
+</dialog>
+
+<dialog id="tb-pop" class="tbpop" aria-labelledby="tbpop-title">
+  <div class="tbpop__head">
+    <div>
+      <h2 id="tbpop-title" tabindex="-1">Choose a colour</h2>
+      <p id="tbpop-sub" class="hint"></p>
+    </div>
+    <button id="tbpop-close" type="button" class="secondary small">Close</button>
+  </div>
+  <div class="tbpop__tools">
+    <label for="tbpop-q" class="visually-hidden">Search your library, or type a colour name or hex code</label>
+    <input id="tbpop-q" class="tb-in" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="Search: light blue, ff8800" aria-describedby="tbpop-status">
+    <div id="tbpop-use" class="tbpop__use" hidden><span id="tbpop-use-dot" class="sw-dot" aria-hidden="true"></span><button id="tbpop-use-btn" type="button" class="secondary small"></button></div>
+    <div id="tbpop-alpha" class="tbpop__alpha">
+      <label for="tbpop-opacity"><span>Opacity</span> <output id="tbpop-opacity-out" for="tbpop-opacity">100%</output></label>
+      <input id="tbpop-opacity" type="range" min="0" max="100" step="1" value="100">
+    </div>
+    <label class="checkline" for="tbpop-pass"><input type="checkbox" id="tbpop-pass"> Only colours that pass contrast</label>
+    <p id="tbpop-status" class="hint" role="status"></p>
+  </div>
+  <ul id="tbpop-list" class="tiles tbpop__tiles" aria-label="Colours"></ul>
+</dialog>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Dathanna by <a href="https://nuadyr.github.io/">Nuadyr</a>. © 2026.</p>
+  </div>
+</footer>
+
+<script>
+'use strict';
+/* ---------- Helpers ---------- */
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(key, fallback = null) { try { const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch { return fallback; } },
+  set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } },
+};
+
+/* Live regions: say(el, text) announces politely, fail(el, text) shows an alert, clear(el) hides both. */
+const say = (el, text) => { el.textContent = text; };
+const fail = (el, text) => { el.textContent = text; el.hidden = !text; };
+const clear = (...els) => els.forEach((el) => { el.textContent = ''; if (el.getAttribute('role') === 'alert') el.hidden = true; });
+
+/* Copy with a fallback for browsers or pages without the async clipboard. */
+const copyText = async (text) => {
+  try { await navigator.clipboard.writeText(text); return true; } catch { /* fall through */ }
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  /* execCommand is deprecated but is the only copy route when the async clipboard is unavailable: keep this fallback. */
+  let ok = false; try { ok = document.execCommand('copy'); } catch { /* unsupported: ok stays false */ }
+  ta.remove(); return ok;
+};
+
+/* Move focus to a heading after content changes so keyboard and screen reader users land in the right place. */
+const focusHeading = (el) => { el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: false }); };
+
+/* ---------- Theme: Auto follows the system, Light and Dark override it ---------- */
+(function theme() {
+  const root = document.documentElement;
+  const btn = $('theme-toggle');
+  const order = ['auto', 'light', 'dark'];
+  const label = { auto: 'Auto', light: 'Light', dark: 'Dark' };
+  const metas = [...document.querySelectorAll('meta[name="theme-color"]')];
+  const paper = { light: '#f3f5ef', dark: '#0e1511' };
+  const apply = (mode) => {
+    if (mode === 'auto') delete root.dataset.theme; else root.dataset.theme = mode;
+    btn.textContent = 'Theme: ' + label[mode];
+    // A manual choice pins the address bar colour; Auto restores the two media-specific values.
+    metas.forEach((m) => {
+      const forScheme = m.media.includes('dark') ? 'dark' : 'light';
+      m.content = mode === 'auto' ? paper[forScheme] : paper[mode];
+    });
+  };
+  let mode = order.includes(store.get('dathanna-theme-mode')) ? store.get('dathanna-theme-mode') : 'auto';
+  try { const legacy = localStorage.getItem('dathanna-theme'); if (legacy === 'light' || legacy === 'dark') mode = mode === 'auto' ? legacy : mode; } catch { /* ignore */ }
+  apply(mode);
+  btn.addEventListener('click', () => {
+    mode = order[(order.indexOf(mode) + 1) % order.length];
+    apply(mode);
+    store.set('dathanna-theme-mode', mode);
+    try { if (mode === 'auto') localStorage.removeItem('dathanna-theme'); else localStorage.setItem('dathanna-theme', mode); } catch { /* ignore */ }
+  });
+})();
+
+/* ---------- Motion: the button pauses all animation and remembers the choice ---------- */
+(function motion() {
+  const btn = $('motion-toggle');
+  const set = (paused) => {
+    if (paused) document.documentElement.dataset.motion = 'paused'; else delete document.documentElement.dataset.motion;
+    btn.setAttribute('aria-pressed', String(paused));
+    btn.textContent = paused ? 'Resume motion' : 'Pause motion';
+  };
+  set(store.get('dathanna-motion-paused', false) === true);
+  btn.addEventListener('click', () => {
+    const paused = document.documentElement.dataset.motion !== 'paused';
+    set(paused); store.set('dathanna-motion-paused', paused);
+  });
+})();
+
+/* ---------- App ---------- */
+(function app() {
+  /* Closest-name list: the CSS named colours, without the duplicate spellings (aqua, magenta, grey). Last word on each line is the hex. */
+  const NAMES_RAW = `alice blue f0f8ff
+antique white faebd7
+aquamarine 7fffd4
+azure f0ffff
+beige f5f5dc
+bisque ffe4c4
+black 000000
+blanched almond ffebcd
+blue 0000ff
+blue violet 8a2be2
+brown a52a2a
+burly wood deb887
+cadet blue 5f9ea0
+chartreuse 7fff00
+chocolate d2691e
+coral ff7f50
+cornflower blue 6495ed
+cornsilk fff8dc
+crimson dc143c
+cyan 00ffff
+dark blue 00008b
+dark cyan 008b8b
+dark goldenrod b8860b
+dark gray a9a9a9
+dark green 006400
+dark khaki bdb76b
+dark magenta 8b008b
+dark olive green 556b2f
+dark orange ff8c00
+dark orchid 9932cc
+dark red 8b0000
+dark salmon e9967a
+dark sea green 8fbc8f
+dark slate blue 483d8b
+dark slate gray 2f4f4f
+dark turquoise 00ced1
+dark violet 9400d3
+deep pink ff1493
+deep sky blue 00bfff
+dim gray 696969
+dodger blue 1e90ff
+fire brick b22222
+floral white fffaf0
+forest green 228b22
+gainsboro dcdcdc
+ghost white f8f8ff
+gold ffd700
+goldenrod daa520
+gray 808080
+green 008000
+green yellow adff2f
+honeydew f0fff0
+hot pink ff69b4
+indian red cd5c5c
+indigo 4b0082
+ivory fffff0
+khaki f0e68c
+lavender e6e6fa
+lavender blush fff0f5
+lawn green 7cfc00
+lemon chiffon fffacd
+light blue add8e6
+light coral f08080
+light cyan e0ffff
+light goldenrod yellow fafad2
+light gray d3d3d3
+light green 90ee90
+light pink ffb6c1
+light salmon ffa07a
+light sea green 20b2aa
+light sky blue 87cefa
+light slate gray 778899
+light steel blue b0c4de
+light yellow ffffe0
+lime 00ff00
+lime green 32cd32
+linen faf0e6
+magenta ff00ff
+maroon 800000
+medium aquamarine 66cdaa
+medium blue 0000cd
+medium orchid ba55d3
+medium purple 9370db
+medium sea green 3cb371
+medium slate blue 7b68ee
+medium spring green 00fa9a
+medium turquoise 48d1cc
+medium violet red c71585
+midnight blue 191970
+mint cream f5fffa
+misty rose ffe4e1
+moccasin ffe4b5
+navajo white ffdead
+navy 000080
+old lace fdf5e6
+olive 808000
+olive drab 6b8e23
+orange ffa500
+orange red ff4500
+orchid da70d6
+pale goldenrod eee8aa
+pale green 98fb98
+pale turquoise afeeee
+pale violet red db7093
+papaya whip ffefd5
+peach puff ffdab9
+peru cd853f
+pink ffc0cb
+plum dda0dd
+powder blue b0e0e6
+purple 800080
+rebecca purple 663399
+red ff0000
+rosy brown bc8f8f
+royal blue 4169e1
+saddle brown 8b4513
+salmon fa8072
+sandy brown f4a460
+sea green 2e8b57
+seashell fff5ee
+sienna a0522d
+silver c0c0c0
+sky blue 87ceeb
+slate blue 6a5acd
+slate gray 708090
+snow fffafa
+spring green 00ff7f
+steel blue 4682b4
+tan d2b48c
+teal 008080
+thistle d8bfd8
+tomato ff6347
+turquoise 40e0d0
+violet ee82ee
+wheat f5deb3
+white ffffff
+white smoke f5f5f5
+yellow ffff00
+yellow green 9acd32`;
+
+  /* ----- Colour maths ----- */
+  const AA = 4.5, AAA = 7, NEAR = 6; // contrast floors, and how close counts as "the same colour"
+  const NON_TEXT_MIN = 3, DIVIDER_MIN = 1.5; // WCAG 1.4.11 floor for controls and focus rings, and the deliberately low floor for decorative dividers
+  const PCT = 100, CHANNEL_MAX = 255, HEX_RADIX = 16, HEX_PAIR = 2, RGB_CHANNELS = 3;
+  const HEX_SHORT = 3, HEX_SHORT_ALPHA = 4, HEX_LONG = 6, HEX_LONG_ALPHA = 8; // valid hex digit counts
+  /* WCAG 2.x relative luminance constants. */
+  const SRGB = { knee: 0.04045, lowDiv: 12.92, offset: 0.055, scale: 1.055, gamma: 2.4 };
+  const LUMA = { r: 0.2126, g: 0.7152, b: 0.0722 };
+  const lin = (c) => { const v = c / CHANNEL_MAX; return v <= SRGB.knee ? v / SRGB.lowDiv : Math.pow((v + SRGB.offset) / SRGB.scale, SRGB.gamma); };
+  const lum = (rgb) => LUMA.r * lin(rgb[0]) + LUMA.g * lin(rgb[1]) + LUMA.b * lin(rgb[2]);
+  const FLARE = 0.05;   // WCAG contrast ratio flare term
+  const contrast = (l1, l2) => (Math.max(l1, l2) + FLARE) / (Math.min(l1, l2) + FLARE);
+  /* sRGB to CIE Lab (D65 white point). */
+  /* The standard sRGB to XYZ matrix, one row per output axis. */
+  const XYZ_ROWS = {
+    x: { r: 0.4124564, g: 0.3575761, b: 0.1804375 },
+    y: { r: 0.2126729, g: 0.7151522, b: 0.072175 },
+    z: { r: 0.0193339, g: 0.119192, b: 0.9503041 },
+  };
+  const WHITE = { x: 0.95047, z: 1.08883 };
+  const LAB = { epsilon: 0.008856, slope: 7.787, shift: 16, lScale: 116, aScale: 500, bScale: 200 };
+  const mixRow = (row, R, G, B) => R * row.r + G * row.g + B * row.b;
+  function toLab(rgb) {
+    const R = lin(rgb[0]), G = lin(rgb[1]), B = lin(rgb[2]);
+    const x = mixRow(XYZ_ROWS.x, R, G, B) / WHITE.x;
+    const y = mixRow(XYZ_ROWS.y, R, G, B);
+    const z = mixRow(XYZ_ROWS.z, R, G, B) / WHITE.z;
+    const f = (t) => (t > LAB.epsilon ? Math.cbrt(t) : LAB.slope * t + LAB.shift / LAB.lScale);
+    const fx = f(x), fy = f(y), fz = f(z);
+    return [LAB.lScale * fy - LAB.shift, LAB.aScale * (fx - fy), LAB.bScale * (fy - fz)];
+  }
+  /* Reads three hex pairs from a string, starting at the given offset (use 1 to skip a leading #). */
+  const hexChannels = (str, start) => [0, 1, 2].map((i) => parseInt(str.slice(start + i * HEX_PAIR, start + (i + 1) * HEX_PAIR), HEX_RADIX));
+  const deltaE = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+
+  const NAMES = NAMES_RAW.trim().split('\n').map((line) => {
+    const i = line.lastIndexOf(' ');
+    const hex = line.slice(i + 1);
+    const rgb = hexChannels(hex, 0);
+    return { name: line.slice(0, i).replace(/\b\w/g, (c) => c.toUpperCase()), rgb, lab: toLab(rgb) };
+  });
+  /* Distance under which a name counts as identical. Each source uses its own metric, so each has its own threshold. */
+  const EXACT_DELTA_LOCAL = 1;                  // CIE76, built-in CSS names
+  const EXACT_DELTA_API = 1;                    // CIEDE2000, Color Name API
+  function nearestName(rgb) {
+    const lab = toLab(rgb);
+    let best = NAMES[0], bestD = Infinity;
+    for (const n of NAMES) { const d = deltaE(lab, n.lab); if (d < bestD) { bestD = d; best = n; } }
+    return { name: best.name, exact: bestD < EXACT_DELTA_LOCAL };
+  }
+
+  /* ----- Backdrops, items and checks ----- */
+  const BACKDROPS = { white: { rgb: [CHANNEL_MAX, CHANNEL_MAX, CHANNEL_MAX], label: 'white' }, black: { rgb: [0, 0, 0], label: 'black' } };
+  const SAFE_STEP = 51, SAFE_LEVELS = 6;        // web-safe channel values: 0, 51 ... 255
+  const MAX_TRIES = 6000;                       // random attempts per colour before giving up
+  const UINT32_BITS = 32;
+  const UINT32_RANGE = 2 ** UINT32_BITS;
+  const DRAG_START_PX = 6, SWIPE_MAX_PX = 140, SWIPE_RATIO = 0.3, TILT_DIVISOR = 18;
+  const FLING_VW = 120, FLING_DEG = 20;         // where a decided card flies to
+  const FIT_TOLERANCE_PX = 1;
+  /* Fly-off and snap-back time comes from the --settle CSS token, so the script and the stylesheet cannot drift apart. */
+  const SETTLE_MS = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--settle')) || 0;
+  const hex2 = (n) => n.toString(HEX_RADIX).padStart(2, '0').toUpperCase();
+  const makeId = (it) => it.r + '-' + it.g + '-' + it.b + '-' + Math.round(it.a * PCT) + '-' + it.bg;
+  const seenOn = (it, bgRgb) => [it.r, it.g, it.b].map((c, i) => Math.round(it.a * c + (1 - it.a) * bgRgb[i]));
+  const validItem = (x) => x && [x.r, x.g, x.b].every((n) => Number.isInteger(n) && n >= 0 && n <= CHANNEL_MAX)
+    && typeof x.a === 'number' && x.a > 0 && x.a <= 1 && Object.prototype.hasOwnProperty.call(BACKDROPS, x.bg);
+
+  /* ----- State and storage ----- */
+  const state = { library: [], blacklist: [], settings: { bg: 'white', safe: false, online: false }, current: null, view: null, queue: [], history: [], shown: 0 };
+
+  /* ----- Colour names: Color Name API (api.color.pizza), with the built-in CSS list as the fallback ----- */
+  const NAME_API = 'https://api.color.pizza/v1/';
+  const NAME_LIST = 'default';   // the API's largest list (31,943 names at the time of writing)
+  const NAME_BATCH = 100;        // the API's per-request limit
+  const NAME_WAIT = 2500;        // longest a card waits for its name before using the built-in one
+  const NAME_PAUSE = 30000;      // after a failed request, stay on built-in names for this long
+  const NAME_CACHE_MAX = 2000;
+  const NAME_CACHE_TRIM = 500;   // extra entries dropped when the cache is full
+  const NAME_MAX_LEN = 80;
+  const NAME_DIST_UNKNOWN = 99;
+  const NAME_TIMEOUT = 8000;     // abort a name request after this long
+  const nameCache = new Map();   // hex of the colour as seen on its backdrop -> { n: name, d: CIEDE2000 distance }
+  let cacheVersion = 0, pausedUntil = 0, lastNetOk = null;
+  (function loadNameCache() {
+    const raw = store.get('dathanna-name-cache', {});
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return;
+    Object.keys(raw).forEach((k) => {
+      const v = raw[k];
+      if (/^[0-9a-f]{6}$/.test(k) && v && typeof v.n === 'string' && v.n && typeof v.d === 'number') nameCache.set(k, { n: v.n.slice(0, NAME_MAX_LEN), d: v.d });
+    });
+  })();
+  function saveNameCache() {
+    if (nameCache.size > NAME_CACHE_MAX) [...nameCache.keys()].slice(0, nameCache.size - NAME_CACHE_MAX + NAME_CACHE_TRIM).forEach((k) => nameCache.delete(k));
+    store.set('dathanna-name-cache', Object.fromEntries(nameCache));
+  }
+  /* The name describes the colour as it appears on its backdrop (the "Looks like" value), not the raw RGB. */
+  const keyOf = (it) => seenOn(it, BACKDROPS[it.bg].rgb).map(hex2).join('').toLowerCase();
+  function nameFor(seen) {
+    const hit = nameCache.get(seen.map(hex2).join('').toLowerCase());
+    if (hit) return { name: hit.n, exact: hit.d < EXACT_DELTA_API, src: 'api' };
+    const local = nearestName(seen);
+    return { name: local.name, exact: local.exact, src: 'local' };
+  }
+  function nameHint(d) {
+    if (d.src === 'api') return d.exact ? 'Practically identical to this named colour' : 'Closest named colour';
+    return d.exact ? 'Matches this CSS colour name' : 'Closest CSS colour name (built-in list)';
+  }
+  const slugify = (s) => s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'colour';
+  function setNameStatus(ok) {
+    if (ok === lastNetOk) return;
+    lastNetOk = ok;
+    say($('names-status'), ok ? '' : 'Online colour names are unavailable right now, so Dathanna is using its built-in CSS names. It will try again shortly.');
+  }
+  const inflight = new Map();    // hex -> promise of the request that will name it
+  async function requestNames(chunk) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), NAME_TIMEOUT);
+    try {
+      const res = await fetch(NAME_API + '?list=' + NAME_LIST + '&values=' + chunk.join(','), { signal: ctrl.signal, headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const rows = data && Array.isArray(data.colors) ? data.colors : [];
+      let got = 0;
+      rows.forEach((row, i) => {
+        if (!row || typeof row.name !== 'string' || !row.name.trim()) return;
+        const key = (typeof row.requestedHex === 'string' ? row.requestedHex.replace('#', '') : (chunk[i] || '')).toLowerCase();
+        if (!chunk.includes(key)) return;
+        const dist = Number(row.distance);
+        nameCache.set(key, { n: row.name.trim().slice(0, NAME_MAX_LEN), d: Number.isFinite(dist) ? dist : NAME_DIST_UNKNOWN });
+        got += 1;
+      });
+      if (!got) throw new Error('No names returned');
+      cacheVersion += 1; saveNameCache(); setNameStatus(true);
+    } catch {
+      pausedUntil = Date.now() + NAME_PAUSE; setNameStatus(false);
+    } finally { clearTimeout(timer); }
+  }
+  /* Resolves once every key has been tried. Never rejects. Keys already cached, or in flight, cost nothing. */
+  function fetchNames(keys) {
+    if (!state.settings.online) return Promise.resolve();
+    const need = [...new Set(keys)].filter((k) => !nameCache.has(k));
+    if (!need.length) return Promise.resolve();
+    if (navigator.onLine === false) { setNameStatus(false); return Promise.resolve(); }
+    if (Date.now() < pausedUntil) return Promise.resolve();
+    const waits = [], fresh = [];
+    need.forEach((k) => { if (inflight.has(k)) waits.push(inflight.get(k)); else fresh.push(k); });
+    for (let i = 0; i < fresh.length; i += NAME_BATCH) {
+      const chunk = fresh.slice(i, i + NAME_BATCH);
+      const p = requestNames(chunk).finally(() => chunk.forEach((k) => inflight.delete(k)));
+      chunk.forEach((k) => inflight.set(k, p));
+      waits.push(p);
+    }
+    return Promise.all(waits).then(() => undefined);
+  }
+
+  function evaluate(it) {
+    const bg = BACKDROPS[it.bg].rgb;
+    const seen = seenOn(it, bg);
+    return { seen, ratio: contrast(lum(seen), lum(bg)) };
+  }
+  function describe(it) {
+    const { seen, ratio } = evaluate(it);
+    const nm = nameFor(seen);
+    const alpha = Math.round(it.a * PCT) / PCT;
+    const floor2 = Math.floor(ratio * PCT) / PCT;
+    return {
+      name: nm.name, exact: nm.exact, src: nm.src,
+      hex6: '#' + hex2(it.r) + hex2(it.g) + hex2(it.b),
+      hex8: '#' + hex2(it.r) + hex2(it.g) + hex2(it.b) + hex2(Math.round(it.a * CHANNEL_MAX)),
+      rgba: 'rgba(' + it.r + ', ' + it.g + ', ' + it.b + ', ' + alpha + ')',
+      pct: Math.round(it.a * PCT),
+      seenHex: '#' + seen.map(hex2).join(''),
+      ratio, ratioText: floor2.toFixed(2),
+      aa: ratio >= AA, aaa: ratio >= AAA,
+      bgLabel: BACKDROPS[it.bg].label, bgRgb: BACKDROPS[it.bg].rgb,
+    };
+  }
+
+  /* ----- Randomness ----- */
+  const rnd = (n) => { const b = new Uint32Array(1); crypto.getRandomValues(b); return Math.floor((b[0] / UINT32_RANGE) * n); };
+  const timeout = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
+
+  const dlg = $('explorer');
+
+  const loadList = (key) => { const raw = store.get(key, []); return Array.isArray(raw) ? raw.filter(validItem).map((x) => ({ r: x.r, g: x.g, b: x.b, a: x.a, bg: x.bg, id: makeId(x) })) : []; };
+  state.library = loadList('dathanna-library');
+  state.blacklist = loadList('dathanna-blacklist');
+  const savedSettings = store.get('dathanna-settings', {});
+  if (savedSettings && Object.prototype.hasOwnProperty.call(BACKDROPS, savedSettings.bg)) state.settings.bg = savedSettings.bg;
+  state.settings.safe = Boolean(savedSettings && savedSettings.safe);
+  state.settings.online = Boolean(savedSettings && savedSettings.online === true);
+  /* Saving can fail when storage is full or blocked. Say so, because the colours would otherwise be lost silently. */
+  const SAVE_FAILED = 'Your colours could not be saved in this browser. Storage may be full or blocked, so they will be lost when you close this page.';
+  const saveAlerts = [$('save-error'), $('ex-save-error')];
+  const saveLists = () => {
+    const libOk = store.set('dathanna-library', state.library);
+    const vetoOk = store.set('dathanna-blacklist', state.blacklist);
+    const ok = libOk && vetoOk;
+    saveAlerts.forEach((a) => fail(a, ok ? '' : SAVE_FAILED));
+    return ok;
+  };
+
+  /* ----- Generating a fresh colour ----- */
+  function tooClose(it) {
+    const bg = BACKDROPS[it.bg].rgb;
+    const lab = toLab(seenOn(it, bg));
+    /* Kept, vetoed and upcoming colours only count against a candidate on the same backdrop, so a colour kept on white can still be offered on black. */
+    const others = [...state.library, ...state.blacklist, ...state.queue, ...(state.current ? [state.current] : [])];
+    return others.some((o) => o.bg === it.bg && deltaE(lab, toLab(seenOn(o, bg))) < NEAR);
+  }
+  function nextColour() {
+    const { bg, safe } = state.settings;
+    const bgRgb = BACKDROPS[bg].rgb;
+    const bgLum = lum(bgRgb);
+    for (let tries = 0; tries < MAX_TRIES; tries++) {
+      const pick = () => (safe ? SAFE_STEP * rnd(SAFE_LEVELS) : rnd(CHANNEL_MAX + 1));
+      const it = { r: pick(), g: pick(), b: pick(), a: 1, bg };
+      const seen = seenOn(it, bgRgb);
+      if (contrast(lum(seen), bgLum) < AA) continue;
+      if (tooClose(it)) continue;
+      it.id = makeId(it);
+      return it;
+    }
+    return null;
+  }
+
+  /* Upcoming colours are generated a few at a time so their names can be fetched in one request. */
+  const QUEUE_MIN = 3, QUEUE_MAX = 6;
+  function fillQueue() {
+    if (state.queue.length >= QUEUE_MIN) return;
+    const fresh = [];
+    while (state.queue.length < QUEUE_MAX) {
+      const it = nextColour();
+      if (!it) break;
+      state.queue.push(it); fresh.push(it);
+    }
+    if (fresh.length) fetchNames(fresh.map(keyOf));
+  }
+  /* Next colour to show, with its name resolved (or the built-in name if the API is slow or down). */
+  async function takeNext() {
+    let it = null;
+    for (let pass = 0; pass < 2 && !it; pass++) {
+      fillQueue();
+      while (state.queue.length && !it) { const c = state.queue.shift(); if (!tooClose(c)) it = c; }
+    }
+    if (it) await Promise.race([fetchNames([keyOf(it)]), timeout(NAME_WAIT)]);
+    fillQueue();
+    return it;
+  }
+
+  /* ----- DOM helpers ----- */
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
+  const motionOff = () => document.documentElement.dataset.motion === 'paused' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function swatchEl(d) {
+    const sw = el('div', 'sw');
+    sw.style.setProperty('--sw-bg', 'rgb(' + d.bgRgb.join(',') + ')');
+    sw.style.setProperty('--sw-fg', d.rgba);
+    sw.setAttribute('role', 'img');
+    sw.setAttribute('aria-label', 'Swatch of ' + d.name + ', ' + d.rgba + ', on ' + d.bgLabel);
+    const txt = el('div', 'sw__text');
+    txt.append(el('span', 'sw__aa', 'Aa'), el('span', 'sw__sample', 'Sample text'));
+    sw.append(el('div', 'sw__fill'), txt);
+    return sw;
+  }
+  function dotEl(d) {
+    const dot = el('span', 'sw-dot');
+    dot.style.setProperty('--sw-bg', 'rgb(' + d.bgRgb.join(',') + ')');
+    dot.style.setProperty('--sw-fg', d.rgba);
+    dot.setAttribute('aria-hidden', 'true');
+    return dot;
+  }
+  function codesEl(d) {
+    const dl = el('dl', 'codes');
+    [['Hex', d.hex6], ['Hex + opacity', d.hex8], ['RGBA', d.rgba], ['Looks like', d.seenHex + ' on ' + d.bgLabel]].forEach(([k, v]) => {
+      const dd = el('dd'); dd.append(el('code', '', v));
+      dl.append(el('dt', '', k), dd);
+    });
+    return dl;
+  }
+  function badgesEl(d) {
+    const wrap = el('div', 'ccard__badges');
+    wrap.append(el('span', 'badge ' + (d.aa ? 'badge--ok' : 'badge--problem'), d.ratioText + ':1 ' + (d.aa ? 'AA pass' : 'AA fail')));
+    if (d.aaa) wrap.append(el('span', 'badge badge--info', 'AAA too'));
+    return wrap;
+  }
+
+  /* ----- Main page: library, vetoes, settings ----- */
+  const libStatus = $('lib-status'), libError = $('lib-error');
+  const RECENT_N = 6;
+  const BGS = ['white', 'black'];
+
+  /* A tile is a button filled with the colour as seen on its backdrop. It has no visible text, so the accessible name carries the details. */
+  function tileEl(it, scope, asBg) {
+    const d = describe(asBg && asBg !== it.bg ? { ...it, bg: asBg } : it);
+    const b = el('button', 'tile');
+    b.type = 'button';
+    b.dataset.id = it.id;
+    b.dataset.focusKey = scope + ':' + it.id;
+    b.style.setProperty('--tile', d.seenHex);
+    b.setAttribute('aria-label', d.name + ', ' + d.hex6 + ' at ' + d.pct + ' percent opacity, kept on ' + BACKDROPS[it.bg].label);
+    return b;
+  }
+  const fillTiles = (ul, items, scope, asBg) => ul.replaceChildren(...items.map((it) => { const li = el('li'); li.append(tileEl(it, scope, asBg)); return li; }));
+
+  /* ----- Library search -----
+     The text becomes a target colour (a name, fuzzy-matched, or a hex or rgb code). The library then shows the SEARCH_MAX kept colours
+     nearest to that target on each backdrop, judged by how each colour looks on its own backdrop. Clearing the box restores the normal library. */
+  const SEARCH_MAX = 30;          // nearest colours shown per backdrop
+  const SEARCH_FUZZY_MAX = 0.4;   // worst name match accepted: 0 is identical, 1 is nothing in common
+  const SEARCH_DEBOUNCE = 200;
+  const HEX_LENGTHS = [HEX_SHORT, HEX_SHORT_ALPHA, HEX_LONG, HEX_LONG_ALPHA];
+  const PHON_MIN_LEN = 3;                   // a final e is only dropped from words longer than this
+  const MATCH = { sound: 0.02, prefix: 0.05, word: 0.12, gapWeight: 0.1, prefixMinLen: 2, wordMinLen: 3 };   // name-match scores (lower is better) and minimum query lengths
+  let searchTarget = null;        // { lab } while a search is active, otherwise null
+  let searchTimer = 0;
+
+  const normText = (t) => t.toLowerCase().replace(/grey/g, 'gray').replace(/[^a-z0-9]+/g, ' ').trim();
+  function editDistance(a, b) {
+    if (a === b) return 0;
+    let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  /* A rough sound-alike form, so "lite blue", "ligth blu" and "light blue" all meet: ght becomes t, ph becomes f, doubled letters collapse, a final e goes. */
+  const phon = (t) => t.split(' ').map((w) => {
+    const x = w.replace(/ght/g, 't').replace(/ph/g, 'f').replace(/(.)\1+/g, '$1');
+    return x.length > PHON_MIN_LEN && x.endsWith('e') ? x.slice(0, -1) : x;
+  }).join(' ');
+  /* 0 means the same name, 0.02 the same sound. Typos score by edit distance, and a start-of-name or whole-word match scores well so "blu" finds Blue. */
+  function nameScore(q, c) {
+    if (q.replace(/ /g, '') === c.replace(/ /g, '')) return 0;
+    const pq = phon(q), pc = phon(c);
+    const qc = pq.replace(/ /g, ''), cc = pc.replace(/ /g, '');
+    if (qc === cc) return MATCH.sound;
+    let best = editDistance(qc, cc) / Math.max(qc.length, cc.length);
+    const gap = Math.max(0, 1 - qc.length / cc.length);
+    if (qc.length >= MATCH.prefixMinLen && cc.startsWith(qc)) best = Math.min(best, MATCH.prefix + MATCH.gapWeight * gap);
+    const ct = pc.split(' ');
+    if (qc.length >= MATCH.wordMinLen && pq.split(' ').every((t) => ct.some((u) => u.startsWith(t)))) best = Math.min(best, MATCH.word + MATCH.gapWeight * gap);
+    return best;
+  }
+  /* Built-in CSS names only, so the online-names setting never changes what a search matches. */
+  const NAME_CANDIDATES = NAMES.map((n) => ({ label: n.name, norm: n.name.toLowerCase(), rgb: n.rgb }));
+  function bestName(q) {
+    let best = null, bestScore = Infinity;
+    for (const c of NAME_CANDIDATES) {
+      if (!c.norm) continue;
+      const sc = nameScore(q, c.norm);
+      if (sc < bestScore) { bestScore = sc; best = c; }
+    }
+    return best ? { label: best.label, rgb: best.rgb, score: bestScore } : null;
+  }
+  /* Returns { rgb, via, label? } for a usable search, or { error } when the text is not understood. */
+  function parseTarget(text) {
+    const raw = text.trim();
+    if (!raw) return null;
+    const q = normText(raw);
+    const triple = raw.match(/^(?:rgba?\s*\()?\s*(\d{1,3})\s*[,\s]\s*(\d{1,3})\s*[,\s]\s*(\d{1,3})\b/i);
+    if (triple) {
+      const rgb = triple.slice(1, 1 + RGB_CHANNELS).map((n) => Number(n));
+      if (rgb.every((n) => n <= CHANNEL_MAX)) return { rgb, via: 'rgb' };
+    }
+    const name = q ? bestName(q) : null;
+    if (name && name.score === 0) return { rgb: name.rgb, via: 'name', label: name.label, exact: true };
+    const h = raw.replace(/^#/, '');
+    const isHex = /^[0-9a-f]+$/i.test(h);
+    if (isHex && HEX_LENGTHS.includes(h.length)) {
+      const full = h.length <= HEX_SHORT_ALPHA ? h.slice(0, HEX_SHORT).replace(/./g, (c) => c + c) : h.slice(0, HEX_LONG);   // 3 and 4 digit forms double each digit; the alpha digits are ignored
+      return { rgb: hexChannels(full, 0), via: 'hex' };
+    }
+    if (name && name.score <= SEARCH_FUZZY_MAX) return { rgb: name.rgb, via: 'name', label: name.label, exact: false };
+    return { error: isHex && h.length <= HEX_LONG_ALPHA ? 'hex' : 'none' };
+  }
+  /* Every kept colour is checked on each backdrop, wherever it was kept, so the Explore settings never change what a search finds.
+     A colour kept on both backdrops counts once, preferring the copy kept on the backdrop being listed. */
+  function nearestTo(bg) {
+    const bgRgb = BACKDROPS[bg].rgb, byColour = new Map();
+    state.library.forEach((it) => {
+      const k = it.r + '-' + it.g + '-' + it.b + '-' + it.a, have = byColour.get(k);
+      if (!have || (it.bg === bg && have.bg !== bg)) byColour.set(k, it);
+    });
+    return [...byColour.values()]
+      .map((it) => ({ it, d: deltaE(searchTarget.lab, toLab(seenOn(it, bgRgb))) }))
+      .sort((x, y) => x.d - y.d)
+      .slice(0, SEARCH_MAX)
+      .map((x) => x.it);
+  }
+
+  const qInput = $('lib-q'), qClear = $('lib-q-clear'), qStatus = $('lib-q-status');
+  function setSearchStatus(text, rgb) {
+    const kids = [];
+    if (rgb) {
+      const css = '#' + rgb.map(hex2).join('');
+      const dot = el('span', 'sw-dot');
+      dot.style.setProperty('--sw-bg', css); dot.style.setProperty('--sw-fg', css);
+      dot.setAttribute('aria-hidden', 'true');
+      kids.push(dot);
+    }
+    if (text) kids.push(el('span', '', text));
+    qStatus.replaceChildren(...kids);
+  }
+  function resetSearch() {
+    clearTimeout(searchTimer);
+    qInput.value = ''; searchTarget = null; qClear.hidden = true; setSearchStatus('', null);
+  }
+  function applySearch() {
+    clearTimeout(searchTimer);
+    const text = qInput.value;
+    qClear.hidden = !text.trim();
+    const res = parseTarget(text);
+    searchTarget = res && res.rgb ? { lab: toLab(res.rgb) } : null;
+    renderMain();
+    if (!res) { setSearchStatus('', null); return; }
+    if (!searchTarget) {
+      setSearchStatus(res.error === 'hex'
+        ? 'A hex code has 3, 4, 6 or 8 digits. Showing the whole library until it is complete.'
+        : 'No colour matched that. Try a name such as light blue, or a hex code such as ff8800. Showing the whole library.', null);
+      return;
+    }
+    const hex = '#' + res.rgb.map(hex2).join('').toUpperCase();
+    let lead;
+    if (res.via !== 'name') lead = 'Nearest to ' + hex + '.';
+    else if (res.exact) lead = 'Nearest to ' + res.label + ' (' + hex + ').';
+    else lead = 'Matched \u201c' + text.trim() + '\u201d to ' + res.label + ' (' + hex + ').';
+    const [w, b] = BGS.map((bg) => $('lib-' + bg).children.length);
+    setSearchStatus(lead + ' On white: ' + w + ' shown. On black: ' + b + ' shown.', res.rgb);
+  }
+  qInput.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    if (!qInput.value.trim()) applySearch(); else searchTimer = setTimeout(applySearch, SEARCH_DEBOUNCE);
+  });
+  qInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); applySearch(); }
+    else if (e.key === 'Escape' && qInput.value) { e.preventDefault(); qInput.value = ''; applySearch(); }
+  });
+  qClear.addEventListener('click', () => { qInput.value = ''; qInput.focus(); applySearch(); });
+
+  function renderMain() {
+    const n = state.library.length;
+    $('lib-count').textContent = n ? '(' + n + ')' : '';
+    $('tab-count').textContent = n ? '(' + n + ')' : '';
+    $('lib-empty').hidden = $('recent-empty').hidden = n > 0;
+    $('lib-full').hidden = $('recent-full').hidden = n === 0;
+    BGS.forEach((bg) => {
+      const all = state.library.filter((x) => x.bg === bg);
+      const found = searchTarget ? nearestTo(bg) : all;
+      [['lib', found], ['recent', all.slice(0, RECENT_N)]].forEach(([prefix, items]) => {
+        const ul = $(prefix + '-' + bg);
+        fillTiles(ul, items, prefix, bg);
+        ul.hidden = items.length === 0;
+        $(prefix + '-' + bg + '-empty').hidden = items.length > 0;
+      });
+      $('lib-' + bg + '-n').textContent = searchTarget ? '(nearest ' + found.length + ')' : '(' + all.length + ')';
+      $('recent-' + bg + '-n').textContent = all.length > RECENT_N ? '(latest ' + RECENT_N + ' of ' + all.length + ')' : '(' + all.length + ')';
+    });
+
+    const m = state.blacklist.length;
+    $('veto-count').textContent = m ? '(' + m + ')' : '';
+    $('veto-empty').hidden = m > 0;
+    $('veto-clear').hidden = m === 0;
+    $('veto-list').replaceChildren(...state.blacklist.map((it) => {
+      const d = describe(it);
+      const li = el('li');
+      const b = el('button', 'secondary small', 'Restore');
+      b.type = 'button'; b.dataset.action = 'restore'; b.dataset.id = it.id; b.setAttribute('aria-label', 'Restore ' + d.name + ' ' + d.hex8 + ' on ' + d.bgLabel);
+      li.append(dotEl(d), el('code', '', d.hex8), el('span', 'hint', d.name + ', vetoed on ' + d.bgLabel), b);
+      return li;
+    }));
+  }
+
+  /* Name any kept or vetoed colours that do not have an online name yet, then redraw once if some arrived. */
+  function refreshNames() {
+    const v = cacheVersion;
+    fetchNames([...state.library, ...state.blacklist].map(keyOf)).then(() => { if (cacheVersion !== v) renderMain(); });
+  }
+
+  function removeFromLibrary(id) {
+    state.library = state.library.filter((x) => x.id !== id);
+    state.history = state.history.filter((h) => h.item.id !== id);
+    saveLists();
+  }
+
+  /* Selecting a tile opens the explorer dialog showing that colour. */
+  const onTile = (e) => {
+    const b = e.target.closest('button[data-id]'); if (!b) return;
+    const it = state.library.find((x) => x.id === b.dataset.id); if (!it) return;
+    openViewer(it, b.dataset.focusKey);
+  };
+  ['recent-white', 'recent-black', 'lib-white', 'lib-black'].forEach((id) => $(id).addEventListener('click', onTile));
+
+  $('lib-css').addEventListener('click', async () => {
+    clear(libStatus, libError);
+    await Promise.race([fetchNames(state.library.map(keyOf)), timeout(NAME_WAIT)]);
+    const used = {};
+    const lines = [];
+    BGS.forEach((bg) => {
+      const items = state.library.filter((x) => x.bg === bg);
+      if (!items.length) return;
+      lines.push('  /* On ' + bg + ' */');
+      items.forEach((it) => {
+        const d = describe(it);
+        const slug = slugify(d.name);
+        used[slug] = (used[slug] || 0) + 1;
+        lines.push('  --colour-' + slug + '-' + used[slug] + ': ' + d.rgba + '; /* ' + d.hex8 + ', ' + d.ratioText + ':1 on ' + d.bgLabel + ' */');
+      });
+    });
+    const css = ':root {\n' + lines.join('\n') + '\n}';
+    if (await copyText(css)) say(libStatus, 'Copied ' + state.library.length + ' colours as CSS variables.'); else fail(libError, 'Copying failed.');
+  });
+  $('lib-clear').addEventListener('click', () => {
+    if (!confirm('Remove all ' + state.library.length + ' colours from your library?')) return;
+    state.library = []; state.history = []; saveLists(); resetSearch(); renderMain(); say(libStatus, 'Library cleared.');
+  });
+  $('veto-list').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-action="restore"]'); if (!b) return;
+    state.blacklist = state.blacklist.filter((x) => x.id !== b.dataset.id);
+    state.history = state.history.filter((h) => h.item.id !== b.dataset.id);
+    saveLists(); renderMain(); say($('veto-status'), 'Colour restored. It can appear again on that backdrop.');
+  });
+  $('veto-clear').addEventListener('click', () => {
+    if (!confirm('Clear all ' + state.blacklist.length + ' vetoes? Those colours can appear again.')) return;
+    state.blacklist = []; saveLists(); renderMain(); say($('veto-status'), 'All vetoes cleared.');
+  });
+
+  /* ----- Theme Builder -----
+     Sixteen colour roles drive a mock web page. Pick a role (tap the page or the list), then give it a colour from the library, a name or a hex code. */
+  const TB_ROLES = [['bg', 'Page background'], ['surface', 'Cards and bars'], ['text', 'Headings and text'], ['muted', 'Secondary text'], ['disabled', 'Disabled and placeholder text'], ['border', 'Dividers and card borders'], ['borderStrong', 'Input and control borders'], ['primary', 'Buttons and links'], ['onPrimary', 'Text on buttons'], ['accent', 'Badges and highlights'], ['onAccent', 'Text on badges'], ['focus', 'Focus ring'], ['danger', 'Errors'], ['success', 'Success'], ['warning', 'Warnings'], ['visited', 'Visited links']];
+  const DARK_LUM_MAX = 0.179;   // a background at or below this luminance counts as dark: it is where black and white text give equal contrast
+  /* Sample data for the mock bar chart: relative heights, then how much of each slot the bar fills and the gap kept above the tallest. */
+  const MOCK_BARS = { jan: 0.45, feb: 0.7, mar: 0.55, apr: 0.9, may: 0.65, jun: 0.8 };
+  const MOCK_BAR_FILL = 0.6, MOCK_BAR_HEADROOM = 8;
+  const TB_LIGHT = { bg: '#FFFFFF', surface: '#F4F4F5', text: '#111111', muted: '#595959', disabled: '#6F6F6F', border: '#C4C4C8', borderStrong: '#767676', primary: '#1D4ED8', onPrimary: '#FFFFFF', accent: '#B45309', onAccent: '#FFFFFF', focus: '#6D28D9', danger: '#B91C1C', success: '#15803D', warning: '#8A5300', visited: '#6B21A8' };
+  const TB_DARK = { bg: '#0B0B0C', surface: '#1A1A1D', text: '#F5F5F5', muted: '#B3B3B3', disabled: '#8A8A8A', border: '#404046', borderStrong: '#8A8A8A', primary: '#7AA2FF', onPrimary: '#000000', accent: '#FFB454', onAccent: '#000000', focus: '#FFD60A', danger: '#FF8A80', success: '#6EE7A0', warning: '#FFC857', visited: '#C4A8FF' };
+  /* The divider checks use a deliberately low floor: decorative dividers are exempt from WCAG 1.4.11, and controls use borderStrong at 3:1. */
+  const TB_CHECKS = [['text', 'bg', 'Text on page', AA], ['muted', 'bg', 'Secondary text on page', AA], ['text', 'surface', 'Text on cards', AA], ['muted', 'surface', 'Secondary text on cards', AA], ['disabled', 'bg', 'Placeholder text on page', AA], ['disabled', 'surface', 'Struck-through text on cards', AA], ['primary', 'bg', 'Links on page', AA], ['primary', 'surface', 'Links on cards', AA], ['visited', 'bg', 'Visited links on page', AA], ['visited', 'surface', 'Visited links on cards', AA], ['onPrimary', 'primary', 'Button text', AA], ['onAccent', 'accent', 'Badge text', AA], ['danger', 'bg', 'Error text on page', AA], ['danger', 'surface', 'Error text on cards', AA], ['success', 'bg', 'Success text on page', AA], ['success', 'surface', 'Success text on cards', AA], ['warning', 'bg', 'Warning text on page', AA], ['warning', 'surface', 'Warning text on cards', AA], ['borderStrong', 'bg', 'Input borders on page', NON_TEXT_MIN], ['borderStrong', 'surface', 'Input borders on cards', NON_TEXT_MIN], ['focus', 'bg', 'Focus ring on page', NON_TEXT_MIN], ['focus', 'surface', 'Focus ring on cards', NON_TEXT_MIN], ['accent', 'bg', 'Meter and progress fill', NON_TEXT_MIN], ['border', 'bg', 'Dividers on page', DIVIDER_MIN], ['border', 'surface', 'Dividers on cards', DIVIDER_MIN]];
+  const kebab = (t) => t.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
+  const hexRgb = (h) => hexChannels(h, 1);
+  /* Opacity. A role's colour is stored as #RRGGBB, or #RRGGBBAA when it is not fully opaque. The page background is always opaque. */
+  const HEX_ANY = /^#[0-9a-f]{6}([0-9a-f]{2})?$/i;
+  const hex6 = (h) => h.slice(0, 7).toUpperCase();
+  const alphaOf = (h) => (h.length === 9 ? parseInt(h.slice(7), HEX_RADIX) / CHANNEL_MAX : 1);
+  const withAlpha = (h, a) => (a >= 1 ? hex6(h) : hex6(h) + hex2(Math.round(a * CHANNEL_MAX)));
+  const pctOf = (h) => Math.round(alphaOf(h) * PCT);
+  const mixOver = (rgb, a, back) => rgb.map((c, i) => Math.round(a * c + (1 - a) * back[i]));
+  /* A role as it looks on the page background. Roles used as backdrops (cards, buttons, badges) are measured this way. */
+  const onPage = (t, role) => (role === 'bg' ? hexRgb(t.bg) : mixOver(hexRgb(t[role]), alphaOf(t[role]), hexRgb(t.bg)));
+  /* Colour a drawn over backdrop b, as two opaque colours [foreground, backdrop]. */
+  const seenPair = (t, a, b) => { const back = onPage(t, b); return [mixOver(hexRgb(t[a]), alphaOf(t[a]), back), back]; };
+  const checkRatio = (t, a, b) => { const [fg, back] = seenPair(t, a, b); return contrast(lum(fg), lum(back)); };
+  const rgbCss = (rgb) => '#' + rgb.map(hex2).join('');
+  const roleName = (r) => TB_ROLES.find((x) => x[0] === r)[1];
+  const theme = Object.assign({}, TB_LIGHT);
+  const savedTheme = store.get('dathanna-theme', {});
+  if (savedTheme && typeof savedTheme === 'object') { if (HEX_ANY.test(savedTheme.bg) && lum(hexRgb(savedTheme.bg)) <= DARK_LUM_MAX) Object.assign(theme, TB_DARK); } /* roles added since the theme was saved start from the matching preset */
+  if (savedTheme && typeof savedTheme === 'object') TB_ROLES.forEach(([r]) => { if (HEX_ANY.test(savedTheme[r])) theme[r] = savedTheme[r].toUpperCase(); });
+  theme.bg = hex6(theme.bg);
+  let tbSel = 'primary';
+  const tbEl = $('tb'), tbStatus = $('tb-status'), tbImg = $('tb-img'), tbCanvas = $('tb-canvas');
+  const LIGHT_MIN = 0.179;   // luminance at which a backdrop has equal contrast with white and with black
+  /* The preset decides which library section feeds the colour picker: Light uses colours kept on white, Dark uses colours kept on black. */
+  let tbMode = store.get('dathanna-theme-mode', null);
+  if (tbMode !== 'white' && tbMode !== 'black') tbMode = lum(hexRgb(theme.bg)) > LIGHT_MIN ? 'white' : 'black';
+  /* The preview holds real controls so the theme is judged on real elements. Inert takes them out of the tab order and the accessibility tree, so the frame stays one labelled image; taps still reach the frame. */
+  [...tbEl.children].forEach((n) => { n.inert = true; });
+  /* The picture and the chart are drawn from the theme, so they follow every change. */
+  function drawArt() {
+    const c = theme;
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><rect width="320" height="180" fill="' + c.surface + '"/><circle cx="240" cy="60" r="28" fill="' + c.accent + '"/><path d="M0 150 90 70l60 55 50-35 120 70v20H0z" fill="' + c.primary + '"/></svg>';
+    tbImg.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
+    const ctx = tbCanvas.getContext && tbCanvas.getContext('2d');
+    if (!ctx) return;
+    const w = tbCanvas.width, h = tbCanvas.height, pad = 40, base = h - pad, top = 24;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = c.surface; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = c.border; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(pad, top); ctx.lineTo(pad, base); ctx.lineTo(w - pad, base); ctx.stroke();
+    const vals = Object.values(MOCK_BARS), slot = (w - pad * 2) / vals.length, bar = slot * MOCK_BAR_FILL;
+    vals.forEach((v, i) => {
+      ctx.fillStyle = i % 2 ? c.accent : c.primary;
+      const bh = (base - top - MOCK_BAR_HEADROOM) * v;
+      ctx.fillRect(pad + slot * i + (slot - bar) / 2, base - bh, bar, bh);
+    });
+  }
+
+  function buildRoles() {
+    $('tb-roles').replaceChildren(...TB_ROLES.map(([r, label]) => {
+      const b = el('button', 'secondary tb-role'); b.type = 'button'; b.dataset.role = r;
+      b.setAttribute('aria-haspopup', 'dialog');
+      const dot = el('span', 'sw-dot'); dot.setAttribute('aria-hidden', 'true');
+      const t = el('span', 'tb-role__t'); t.append(el('span', '', label), el('code', '', '--color-' + kebab(r)), el('code', 'tb-hex'));
+      b.append(dot, t); return b;
+    }));
+  }
+  function renderTheme() {
+    TB_ROLES.forEach(([r]) => tbEl.style.setProperty('--tb-' + kebab(r), theme[r]));
+    $('tb-roles').querySelectorAll('button').forEach((b) => {
+      const c = theme[b.dataset.role], faint = alphaOf(c) < 1;
+      b.setAttribute('aria-pressed', String(b.dataset.role === tbSel));
+      b.firstChild.style.setProperty('--sw-bg', faint ? theme.bg : c); b.firstChild.style.setProperty('--sw-fg', c);
+      b.querySelector('.tb-hex').textContent = faint ? c + ', ' + pctOf(c) + '%' : c;
+      b.setAttribute('aria-label', roleName(b.dataset.role) + ', variable --color-' + kebab(b.dataset.role) + ', now ' + c + (faint ? ', ' + pctOf(c) + ' percent opacity' : '') + '. Choose a colour.');
+    });
+    tbEl.querySelectorAll('[data-role]').forEach((n) => n.toggleAttribute('data-on', n.dataset.role === tbSel));
+    tbEl.toggleAttribute('data-on', tbSel === 'bg');
+    let passed = 0;
+    $('tb-checks').replaceChildren(...TB_CHECKS.map(([a, b, label, min]) => {
+      const ratio = checkRatio(theme, a, b), ok = ratio >= min, [fg, back] = seenPair(theme, a, b);
+      if (ok) passed += 1;
+      const li = el('li'), smp = el('span', 'tb-sample', 'Aa');
+      smp.style.color = rgbCss(fg); smp.style.background = rgbCss(back); smp.setAttribute('aria-hidden', 'true');
+      li.append(smp, el('span', 'hint', label + ': ' + (Math.floor(ratio * PCT) / PCT).toFixed(2) + ':1'), el('span', 'badge ' + (ok ? 'badge--ok' : 'badge--problem'), (ok ? 'Pass ' : 'Fail ') + min + ':1'));
+      return li;
+    }));
+    $('tb-summary').textContent = passed + ' of ' + TB_CHECKS.length + ' checks pass.';
+    tbEl.style.setProperty('color-scheme', lum(hexRgb(theme.bg)) > LIGHT_MIN ? 'light' : 'dark');
+    $('tb-mode').textContent = 'The colour picker shows your library colours kept on ' + tbMode + ', plus white and black.';
+    drawArt();
+    store.set('dathanna-theme', theme); store.set('dathanna-theme-mode', tbMode);
+  }
+  function assign(r, hex) {
+    theme[r] = withAlpha(hex, alphaOf(theme[r])); renderTheme();
+    say(tbStatus, roleName(r) + ' is now ' + nearestName(hexRgb(hex)).name + ' ' + theme[r] + '.');
+  }
+  function setOpacity(r, pct) {
+    if (r === 'bg') return;
+    theme[r] = withAlpha(theme[r], pct / PCT); renderTheme();
+  }
+
+  /* ----- Colour picker popover -----
+     Opens from a CSS variable chip (or a tap on the preview). Lists the library (plus white and black) as small 2:3 tiles that scroll.
+     Typing searches by colour name or hex: nearest colours first, and names that contain the text come before those. */
+  const pop = $('tb-pop'), popQ = $('tbpop-q'), popList = $('tbpop-list'), popPass = $('tbpop-pass');
+  const popUse = $('tbpop-use'), popUseBtn = $('tbpop-use-btn'), popUseDot = $('tbpop-use-dot');
+  const popOpacity = $('tbpop-opacity'), popOpacityOut = $('tbpop-opacity-out');
+  let popTyped = null, popViaPreview = false;
+  const pickerSub = (role) => 'Choose a colour for --color-' + kebab(role) + ' (now ' + theme[role] + '). Showing colours kept on ' + tbMode + '.' + (role === 'bg' ? ' The page background stays fully opaque.' : '');
+  const syncOpacity = () => { const v = popOpacity.value; popOpacityOut.textContent = v + '%'; popOpacity.setAttribute('aria-valuetext', v + ' percent'); };
+
+  function paletteItems() {
+    const have = new Set(['#FFFFFF', '#000000']);
+    const items = [{ hex: '#FFFFFF', name: 'White' }, { hex: '#000000', name: 'Black' }];
+    state.library.filter((it) => it.bg === tbMode).forEach((it) => { const d = describe(it); if (!have.has(d.seenHex)) { have.add(d.seenHex); items.push({ hex: d.seenHex, name: d.name }); } });
+    return items;
+  }
+  /* Would this colour keep every contrast check that involves the role passing? */
+  const rolePasses = (role, hex) => {
+    const t = Object.assign({}, theme, { [role]: withAlpha(hex, alphaOf(theme[role])) });
+    return TB_CHECKS.every(([a, b, , min]) => (role !== 'bg' && a !== role && b !== role) || checkRatio(t, a, b) >= min);
+  };
+  function renderPicker() {
+    const role = tbSel, q = popQ.value.trim();
+    let items = paletteItems();
+    const res = q ? parseTarget(q) : null;
+    popTyped = res && res.rgb ? '#' + res.rgb.map(hex2).join('') : null;
+    if (q) {
+      const nq = normText(q), tl = popTyped ? toLab(hexRgb(popTyped)) : null;
+      items = items
+        .map((x) => ({ x, hit: nq !== '' && normText(x.name).includes(nq), d: tl ? deltaE(tl, toLab(hexRgb(x.hex))) : Infinity }))
+        .filter((m) => m.hit || tl)
+        .sort((m, n) => (Number(n.hit) - Number(m.hit)) || (m.d - n.d) || 0)
+        .map((m) => m.x);
+    }
+    const total = items.length;
+    if (popPass.checked) items = items.filter((x) => rolePasses(role, x.hex));
+    popList.replaceChildren(...items.map((x) => {
+      const li = el('li'), b = el('button', 'tile'); b.type = 'button'; b.dataset.hex = x.hex;
+      b.style.setProperty('--tile', x.hex);
+      b.setAttribute('aria-label', x.name + ' ' + x.hex);
+      b.setAttribute('aria-pressed', String(x.hex === hex6(theme[role])));
+      li.append(b); return li;
+    }));
+    popUse.hidden = !popTyped;
+    if (popTyped) {
+      popUseBtn.dataset.hex = popTyped; popUseBtn.textContent = 'Use ' + popTyped + ' (' + nearestName(hexRgb(popTyped)).name + ')';
+      popUseDot.style.setProperty('--sw-bg', popTyped); popUseDot.style.setProperty('--sw-fg', popTyped);
+    }
+    const hidden = total - items.length;
+    let text;
+    if (!items.length) {
+      if (q && !popTyped && !total) text = 'No library colour matched that. Try a name such as light blue, or a hex code such as ff8800.';
+      else if (popPass.checked) text = 'No colours pass contrast for this variable. Turn the filter off to see them all.';
+      else text = 'No colours to show.';
+    }
+    else text = items.length + (items.length === 1 ? ' colour' : ' colours') + (q ? ', nearest first' : '') + (hidden ? ', ' + hidden + ' hidden by the contrast filter' : '') + '.';
+    if (!q && !state.library.some((it) => it.bg === tbMode)) text += ' Nothing is kept on ' + tbMode + ' in your library yet.';
+    say($('tbpop-status'), text);
+  }
+  function openPicker(role, fromPreview) {
+    if (pop.open || dlg.open) return;
+    tbSel = role; popViaPreview = Boolean(fromPreview); renderTheme();
+    $('tbpop-title').textContent = roleName(role);
+    $('tbpop-sub').textContent = pickerSub(role);
+    $('tbpop-alpha').hidden = role === 'bg';
+    popOpacity.value = String(pctOf(theme[role])); syncOpacity();
+    popQ.value = '';
+    renderPicker();
+    document.documentElement.classList.add('is-modal');
+    pop.showModal();
+    popList.scrollTop = 0;
+    $('tbpop-title').focus();
+  }
+  const useFromPicker = (hex) => { assign(tbSel, hex); pop.close(); };
+  $('tb-roles').addEventListener('click', (e) => { const b = e.target.closest('button[data-role]'); if (b) openPicker(b.dataset.role, false); });
+  /* Controls inside the preview ignore the pointer, so a click is matched to the smallest themed box under it. */
+  /* A tap resolves to the smallest themed box under it, then is refined: text drawn on a solid fill (data-text-role) opens the text-on-fill role,
+     and a tap within a few pixels of a visible border opens the border role that edge is actually painted with. */
+  const EDGE_SLOP_PX = 4, MIN_HIT_PX = 12;   // how far from a border still counts as hitting it, and the smallest tap target
+  const STRONG_EDGE = '.tb-input, .tb-out, progress, meter, .tb-pg, code, kbd, samp, pre';
+  function onText(n, x, y) {
+    const w = document.createTreeWalker(n, NodeFilter.SHOW_TEXT), rg = document.createRange();
+    for (let t = w.nextNode(); t; t = w.nextNode()) {
+      if (!t.textContent.trim()) continue;
+      rg.selectNodeContents(t);
+      for (const r of rg.getClientRects()) if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return true;
+    }
+    return false;
+  }
+  function edgeRole(n, x, y) {
+    const cs = getComputedStyle(n), r = n.getBoundingClientRect(), role = n.matches(STRONG_EDGE) ? 'borderStrong' : 'border';
+    const want = hexRgb(theme[role]);
+    const sameEdge = (css) => { const m = css.match(/[\d.]+/g); return Boolean(m) && want.every((v, i) => Number(m[i]) === v); };   // rgb() or rgba(): the channels, whatever the opacity
+    return [['Top', y - r.top], ['Bottom', r.bottom - y], ['Left', x - r.left], ['Right', r.right - x]]
+      .some(([s, d]) => { const w = parseFloat(cs['border' + s + 'Width']); return w > 0 && sameEdge(cs['border' + s + 'Color']) && d <= w + EDGE_SLOP_PX; }) ? role : null;
+  }
+  /* Thin boxes such as dividers get a minimum tap height so they can be hit with a finger. */
+  const hitRect = (n) => {
+    const r = n.getBoundingClientRect(), px = Math.max(0, (MIN_HIT_PX - r.height) / 2), py = Math.max(0, (MIN_HIT_PX - r.width) / 2);
+    return { left: r.left - py, right: r.right + py, top: r.top - px, bottom: r.bottom + px, width: r.width + py * 2, height: r.height + px * 2, raw: r };
+  };
+  /* The smallest element whose painted border edge is under the point, whichever element it belongs to. */
+  function edgeAt(x, y) {
+    let hit = null, area = Infinity;
+    tbEl.querySelectorAll('*').forEach((n) => {
+      const r = n.getBoundingClientRect();
+      if (!r.width || !r.height || x < r.left || x > r.right || y < r.top || y > r.bottom || r.width * r.height > area) return;
+      const role = edgeRole(n, x, y);
+      if (role) { hit = role; area = r.width * r.height; }
+    });
+    return hit;
+  }
+  function roleAt(x, y) {
+    let best = tbEl, area = Infinity;
+    tbEl.querySelectorAll('[data-role]').forEach((n) => {
+      const r = hitRect(n);
+      if (!r.raw.width && !r.raw.height || x < r.left || x > r.right || y < r.top || y > r.bottom) return;
+      if (r.width * r.height <= area) { area = r.width * r.height; best = n; }
+    });
+    if (best.dataset.textRole && onText(best, x, y)) return best.dataset.textRole;
+    return edgeAt(x, y) || best.dataset.role;
+  }
+  tbEl.addEventListener('click', (e) => { e.preventDefault(); openPicker(roleAt(e.clientX, e.clientY), true); });
+  popList.addEventListener('click', (e) => { const b = e.target.closest('button[data-hex]'); if (b) useFromPicker(b.dataset.hex); });
+  popUseBtn.addEventListener('click', () => { if (popUseBtn.dataset.hex) useFromPicker(popUseBtn.dataset.hex); });
+  popQ.addEventListener('input', renderPicker);
+  popQ.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); if (popTyped) useFromPicker(popTyped); }
+    else if (e.key === 'Escape' && popQ.value) { e.preventDefault(); popQ.value = ''; renderPicker(); }
+  });
+  popPass.addEventListener('change', renderPicker);
+  /* The slider updates the preview as it moves. The contrast filter, if on, is refreshed once the slider is released. */
+  popOpacity.addEventListener('input', () => { setOpacity(tbSel, Number(popOpacity.value)); syncOpacity(); $('tbpop-sub').textContent = pickerSub(tbSel); });
+  popOpacity.addEventListener('change', () => { if (popPass.checked) renderPicker(); });
+  $('tbpop-close').addEventListener('click', () => pop.close());
+  /* A click on the dimmed backdrop lands on the dialog element itself, outside its box. */
+  pop.addEventListener('click', (e) => {
+    if (e.target !== pop) return;
+    const r = pop.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) pop.close();
+  });
+  pop.addEventListener('close', () => {
+    document.documentElement.classList.remove('is-modal');
+    if (popViaPreview) { const b = $('tb-roles').querySelector('[data-role="' + tbSel + '"]'); if (b) b.focus({ preventScroll: true }); }
+  });
+  $('tb-light').addEventListener('click', () => { Object.assign(theme, TB_LIGHT); tbMode = 'white'; renderTheme(); say(tbStatus, 'Light preset applied. The picker now shows colours kept on white.'); });
+  $('tb-dark').addEventListener('click', () => { Object.assign(theme, TB_DARK); tbMode = 'black'; renderTheme(); say(tbStatus, 'Dark preset applied. The picker now shows colours kept on black.'); });
+  $('tb-swap').addEventListener('click', () => { const was = theme.bg, text = theme.text; theme.bg = hex6(text); theme.text = withAlpha(was, alphaOf(text)); tbMode = tbMode === 'white' ? 'black' : 'white'; renderTheme(); say(tbStatus, 'Swapped the page background and text colours. The picker now shows colours kept on ' + tbMode + '.'); });
+  $('tb-copy').addEventListener('click', async () => {
+    const css = ':root {\n' + TB_ROLES.map(([r]) => '  --color-' + kebab(r) + ': ' + theme[r] + ';').join('\n') + '\n}';
+    say(tbStatus, (await copyText(css)) ? 'Copied the theme as CSS variables.' : 'Copying failed.');
+  });
+  buildRoles(); renderTheme();
+
+  /* Tabs: Explore and Library. Arrow keys, Home and End move between them. */
+  const TABS = ['home', 'lib', 'theme'];
+  function selectTab(name, focusTab) {
+    TABS.forEach((t) => {
+      const on = t === name;
+      $('tab-' + t).setAttribute('aria-selected', String(on));
+      $('tab-' + t).setAttribute('tabindex', on ? '0' : '-1');
+      $('panel-' + t).hidden = !on;
+    });
+    if (focusTab) $('tab-' + name).focus();
+  }
+  TABS.forEach((t, i) => {
+    $('tab-' + t).addEventListener('click', () => selectTab(t));
+    $('tab-' + t).addEventListener('keydown', (e) => {
+      const k = e.key;
+      let j = null;
+      if (k === 'ArrowRight') j = (i + 1) % TABS.length;
+      else if (k === 'ArrowLeft') j = (i - 1 + TABS.length) % TABS.length;
+      else if (k === 'Home') j = 0;
+      else if (k === 'End') j = TABS.length - 1;
+      if (j === null) return;
+      e.preventDefault(); selectTab(TABS[j], true);
+    });
+  });
+  $('view-library').addEventListener('click', () => { selectTab('lib'); focusHeading($('lib-heading')); });
+
+  /* Settings */
+  $('bg-' + state.settings.bg).checked = true;
+  $('opt-safe').checked = state.settings.safe;
+  $('opt-online').checked = state.settings.online;
+  const onSetting = () => {
+    state.settings.bg = $('bg-black').checked ? 'black' : 'white';
+    state.settings.safe = $('opt-safe').checked;
+    state.settings.online = $('opt-online').checked;
+    store.set('dathanna-settings', state.settings);
+    state.current = null; state.queue = [];
+    if (state.settings.online) { pausedUntil = 0; refreshNames(); } else { lastNetOk = null; say($('names-status'), ''); }
+  };
+  ['bg-white', 'bg-black', 'opt-safe', 'opt-online'].forEach((id) => $(id).addEventListener('change', onSetting));
+
+  /* ----- Explorer dialog ----- */
+  const stage = $('ex-stage'), slot = $('ex-slot'), live = $('ex-live');
+  const pvBox = $('ex-preview'), pv = $('pv');
+  const keepBtn = $('ex-keep'), vetoBtn = $('ex-veto'), undoBtn = $('ex-undo');
+  let busy = false;
+  let openerKey = null;
+
+  function updateChrome() {
+    const kept = state.history.filter((h) => h.kind === 'keep').length;
+    const vetoed = state.history.length - kept;
+    $('ex-count').textContent = 'Kept ' + kept + ', vetoed ' + vetoed;
+    const stranded = !state.current && (document.activeElement === keepBtn || document.activeElement === vetoBtn);
+    keepBtn.disabled = vetoBtn.disabled = !state.current;
+    undoBtn.disabled = state.history.length === 0;
+    if (stranded) (undoBtn.disabled ? $('ex-title') : undoBtn).focus();
+  }
+
+  /* ----- Preview accordion ----- */
+  /* The stage is locked (no scrolling) until the preview is open. If the card alone is taller than the screen,
+     scrolling stays on so nothing is cut off at large text sizes or on short screens. */
+  function syncScroll() {
+    const open = !pvBox.hidden && pvBox.open;
+    const fits = stage.scrollHeight <= stage.clientHeight + FIT_TOLERANCE_PX;
+    const next = open || !fits ? 'on' : 'off';
+    if (stage.dataset.scroll === next) return;
+    stage.dataset.scroll = next;
+    if (next === 'off') stage.scrollTop = 0;
+  }
+  /* Show a colour as headings, a card, buttons and a dropdown on the backdrop it belongs to. Pass null to hide the preview. */
+  function setPreview(it) {
+    if (!it) {
+      if (pvBox.contains(document.activeElement)) $('ex-title').focus();
+      pvBox.hidden = true; syncScroll(); return;
+    }
+    const d = describe(it);
+    pvBox.hidden = false;
+    $('pv-title').textContent = 'Preview on ' + d.bgLabel;
+    $('pv-hint').textContent = 'This is the colour as text, borders and buttons on ' + d.bgLabel + '. Filled buttons put ' + d.bgLabel + ' text on the colour. Their contrast is ' + d.ratioText + ':1.';
+    pv.dataset.bg = it.bg;
+    pv.style.setProperty('--pv-bg', 'rgb(' + d.bgRgb.join(',') + ')');
+    pv.style.setProperty('--pv-fg', d.seenHex);
+    pv.setAttribute('aria-label', 'Headings, a card, buttons and a dropdown in ' + d.name + ', ' + d.hex6 + ', on ' + d.bgLabel);
+    pv.classList.remove('is-pending');
+    syncScroll();
+  }
+  const resetPreview = () => { pvBox.open = false; stage.dataset.scroll = 'off'; stage.scrollTop = 0; };
+  pvBox.addEventListener('toggle', () => {
+    syncScroll();
+    /* Opening the preview brings it to the top of the stage so the change is visible. */
+    if (pvBox.open) requestAnimationFrame(() => pvBox.scrollIntoView({ block: 'start', behavior: motionOff() ? 'auto' : 'smooth' }));
+  });
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(() => requestAnimationFrame(syncScroll));
+    [stage, slot, pvBox].forEach((n) => ro.observe(n));
+  } else window.addEventListener('resize', syncScroll);
+
+  /* view = true builds the reference card used by the library viewer: no stamps and no swiping. */
+  function buildCard(it, view) {
+    const d = describe(it);
+    const card = el('article', view ? 'ccard ccard--static' : 'ccard');
+    card.setAttribute('aria-label', d.name + ' colour card');
+    const body = el('div', 'ccard__body');
+    const badges = badgesEl(d);
+    if (view) badges.append(el('span', 'badge badge--info', 'Kept on ' + d.bgLabel));
+    body.append(el('h3', '', d.name), el('p', 'hint', nameHint(d)), codesEl(d), badges);
+    if (view) { card.append(swatchEl(d), body); return card; }
+    const k = el('span', 'stamp stamp--keep', 'Keep'); k.setAttribute('aria-hidden', 'true');
+    const v = el('span', 'stamp stamp--veto', 'Veto'); v.setAttribute('aria-hidden', 'true');
+    card.append(k, v, swatchEl(d), body);
+    attachDrag(card);
+    return card;
+  }
+
+  function renderCard(prefix) {
+    if (state.view) return;
+    if (!state.current) {
+      const note = el('p', 'note note--warn');
+      note.append(el('span', '', 'No fresh colour found with these settings. Restore some vetoes, loosen the settings, or press Undo.'));
+      note.style.margin = 'auto'; note.style.maxInlineSize = '26rem';
+      slot.replaceChildren(note);
+      setPreview(null);
+      say(live, (prefix ? prefix + ' ' : '') + 'No fresh colour found.');
+    } else {
+      state.shown += 1;
+      const d = describe(state.current);
+      slot.replaceChildren(buildCard(state.current));
+      setPreview(state.current);
+      say(live, (prefix ? prefix + ' ' : '') + 'Colour ' + state.shown + ': ' + d.name + ', ' + d.hex6 + ', opacity ' + d.pct + ' percent, contrast ' + d.ratioText + ' to 1 on ' + d.bgLabel + ', passes AA.');
+    }
+    updateChrome();
+  }
+
+  function decide(kind) {
+    if (busy || state.view || !state.current) return;
+    busy = true;
+    const it = state.current, d = describe(it);
+    (kind === 'keep' ? state.library : state.blacklist).unshift(it);
+    state.history.push({ kind, item: it });
+    saveLists();
+    const verb = kind === 'keep' ? 'Kept' : 'Vetoed';
+    say($('ex-status'), verb + ' ' + d.name + ' ' + d.hex6 + '.');
+    pv.classList.add('is-pending');
+    const card = slot.firstElementChild;
+    const finish = async () => {
+      try { state.current = await takeNext(); } catch { state.current = null; }
+      /* The explorer may have been closed during the fly-off: skip card and preview work, but still refresh the home lists. */
+      if (dlg.open) renderCard(verb + ' ' + d.name + '.'); else renderMain();
+      busy = false;
+    };
+    if (!card || !card.classList.contains('ccard') || motionOff()) { finish(); return; }
+    const dir = kind === 'keep' ? 1 : -1;
+    card.classList.remove('is-dragging'); card.classList.add('is-settling');
+    card.style.setProperty(kind === 'keep' ? '--keep-o' : '--veto-o', '1');
+    card.style.transform = 'translateX(' + dir * FLING_VW + 'vw) rotate(' + dir * FLING_DEG + 'deg)';
+    setTimeout(finish, SETTLE_MS);
+  }
+
+  function undo() {
+    if (busy || state.view || !state.history.length) return;
+    const h = state.history.pop();
+    const list = h.kind === 'keep' ? state.library : state.blacklist;
+    const i = list.findIndex((x) => x.id === h.item.id);
+    if (i > -1) list.splice(i, 1);
+    saveLists();
+    state.current = h.item;
+    const d = describe(h.item);
+    say($('ex-status'), 'Undid ' + (h.kind === 'keep' ? 'keep' : 'veto') + ' for ' + d.name + '.');
+    renderCard('Undone.');
+  }
+
+  /* Swipe: pointer events, horizontal only so the page can still scroll vertically. */
+  function attachDrag(card) {
+    let id = null, startX = 0, dx = 0, dragging = false;
+    const threshold = () => Math.min(SWIPE_MAX_PX, card.offsetWidth * SWIPE_RATIO);
+    const setStamps = (p) => { card.style.setProperty('--keep-o', dx > 0 ? p : 0); card.style.setProperty('--veto-o', dx < 0 ? p : 0); };
+    const snapBack = () => {
+      card.classList.add('is-settling'); card.style.transform = ''; card.style.setProperty('--keep-o', 0); card.style.setProperty('--veto-o', 0);
+      setTimeout(() => card.classList.remove('is-settling'), SETTLE_MS);
+    };
+    card.addEventListener('pointerdown', (e) => {
+      if (busy || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      id = e.pointerId; startX = e.clientX; dx = 0; dragging = false;
+      card.classList.remove('is-settling');
+      try { card.setPointerCapture(id); } catch { /* capture unavailable */ }
+    });
+    card.addEventListener('pointermove', (e) => {
+      if (e.pointerId !== id) return;
+      dx = e.clientX - startX;
+      if (!dragging && Math.abs(dx) > DRAG_START_PX) { dragging = true; card.classList.add('is-dragging'); }
+      if (!dragging) return;
+      card.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / TILT_DIVISOR + 'deg)';
+      setStamps(Math.min(1, Math.abs(dx) / threshold()));
+    });
+    card.addEventListener('pointerup', (e) => {
+      if (e.pointerId !== id) return;
+      id = null; card.classList.remove('is-dragging');
+      if (!dragging) return;
+      dragging = false;
+      if (Math.abs(dx) >= threshold()) decide(dx > 0 ? 'keep' : 'veto'); else snapBack();
+    });
+    card.addEventListener('pointercancel', (e) => {
+      if (e.pointerId !== id) return;
+      id = null; card.classList.remove('is-dragging');
+      if (dragging) { dragging = false; snapBack(); }
+    });
+  }
+
+  /* The dialog has two modes: exploring (keep, veto, undo) and viewing one kept colour (copy, remove). */
+  function setViewMode(it) {
+    state.view = it;
+    $('ex-title').textContent = it ? 'Library colour' : 'Explore the colours';
+    $('ex-actions').hidden = Boolean(it);
+    $('ex-help').hidden = Boolean(it);
+    $('ex-view-actions').hidden = !it;
+    say($('ex-status'), '');
+    if (it) say($('ex-count'), 'Kept on ' + BACKDROPS[it.bg].label); else updateChrome();
+  }
+  function openViewer(it, key) {
+    if (dlg.open) return;
+    openerKey = key || null;
+    setViewMode(it);
+    resetPreview();
+    document.documentElement.classList.add('is-modal');
+    dlg.showModal();
+    $('ex-title').focus();
+    slot.replaceChildren(buildCard(it, true));
+    setPreview(it);
+    const d = describe(it);
+    say(live, d.name + ', ' + d.hex6 + ', opacity ' + d.pct + ' percent, kept on ' + d.bgLabel + ', contrast ' + d.ratioText + ' to 1.');
+  }
+  /* The lists are redrawn when the dialog closes, so put focus back on the tile that opened it (or its section heading if it is gone). */
+  function restoreFocus() {
+    if (!openerKey) return;
+    const t = document.querySelector('[data-focus-key="' + openerKey + '"]');
+    if (t) t.focus(); else focusHeading($(openerKey.indexOf('recent') === 0 ? 'recent-heading' : 'lib-heading'));
+    openerKey = null;
+  }
+  const viewNote = (msg) => { say($('ex-status'), msg); say(live, msg); };
+  $('view-copy-hex').addEventListener('click', async () => {
+    if (!state.view) return;
+    const v = describe(state.view).hex6;
+    viewNote(await copyText(v) ? 'Copied ' + v + '.' : 'Copying failed. Select the text and copy it by hand.');
+  });
+  $('view-copy-rgba').addEventListener('click', async () => {
+    if (!state.view) return;
+    const v = describe(state.view).rgba;
+    viewNote(await copyText(v) ? 'Copied ' + v + '.' : 'Copying failed. Select the text and copy it by hand.');
+  });
+  $('view-remove').addEventListener('click', () => {
+    const it = state.view; if (!it) return;
+    const d = describe(it);
+    removeFromLibrary(it.id);
+    say(libStatus, 'Removed ' + d.name + ' from your library.');
+    dlg.close();
+  });
+
+  async function openExplorer() {
+    if (dlg.open) return;
+    openerKey = null;
+    setViewMode(null);
+    resetPreview();
+    state.shown = Math.max(0, state.shown);
+    document.documentElement.classList.add('is-modal');
+    dlg.showModal();
+    say($('ex-status'), '');
+    $('ex-title').focus();
+    if (!state.current) {
+      const wait = el('p', 'hint', 'Finding a colour\u2026');
+      wait.style.margin = 'auto';
+      slot.replaceChildren(wait);
+      setPreview(null);
+      updateChrome();
+      busy = true;
+      try { state.current = await takeNext(); } catch { state.current = null; }
+      busy = false;
+    }
+    renderCard('');
+  }
+  document.querySelectorAll('[data-open-explorer]').forEach((b) => b.addEventListener('click', openExplorer));
+  $('ex-close').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('close', () => { document.documentElement.classList.remove('is-modal'); resetPreview(); setViewMode(null); renderMain(); refreshNames(); restoreFocus(); });
+  keepBtn.addEventListener('click', () => decide('keep'));
+  vetoBtn.addEventListener('click', () => decide('veto'));
+  undoBtn.addEventListener('click', undo);
+  dlg.addEventListener('keydown', (e) => {
+    if (state.view || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); decide('keep'); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); decide('veto'); }
+  });
+
+  renderMain();
+  refreshNames();
+})();
+</script>
+</body>
+</html>
