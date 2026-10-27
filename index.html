@@ -1,39 +1,51 @@
 <!DOCTYPE html>
 <html lang="en-GB">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jVmIf2zVD/cRBDrbMtM0BzdRa4G5S0OQJBermkakGt0=' 'sha256-T1WILTWjuLVzhfDzUxla1A0bw/UAydFoN9NWjN6ywvA='; style-src 'sha256-1UgoVEf2IJvNCTvVccWuEVd2rxtH+ER7Ug+BQ3uYx6Y='; img-src data:; connect-src https://api.color.pizza; base-uri 'none'; form-action 'none'">
-<title>Dathanna: swipe to find colours that pass WCAG AA</title>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-0KbLDj8Y6ewtphDXanHPsxaCN8NSaqEzryy25PlTI8M=' 'sha256-yfGykRhktGmQKUGYfwOrrTwxKJWsIr+1DvW/HteTQp4='; style-src 'sha256-T24mp60SueirAy0zggaiPUj+HTN+ZLVwFINi/mQGtX8='; img-src data:; connect-src https://api.color.pizza; base-uri 'none'; form-action 'none'">
+        <title>Dathanna: swipe to find colours that pass WCAG AA</title>
 
-<!--
-  Dathanna by Nuadyr. Single file, no build step, no dependencies.
-  Dark mode follows the system setting; the Theme button adds a manual override.
-  Every colour offered passes AA text contrast (4.5:1) against the chosen backdrop after alpha compositing.
-  No manifest and no service worker on purpose.
-  Colour names use the built-in CSS list by default. "Look up colour names online" is opt-in (off by default) and then uses the Color Name API (api.color.pizza).
-  A Content-Security-Policy meta restricts the page to its own inline code (by hash) and that one API host. If you edit an inline style or script block, regenerate its hash.
--->
+        <!--
+            Dathanna by Nuadyr. Single file, no build step, no dependencies.
+            Dark mode follows the system setting; the Theme button adds a manual override.
+            Every colour offered passes AA text contrast (4.5:1) against the chosen backdrop after alpha compositing.
+            No manifest and no service worker on purpose.
+            Colour names use the built-in CSS list by default. "Look up colour names online" is opt-in (off by default) and then uses the Color Name API (api.color.pizza).
+            A Content-Security-Policy meta restricts the page to its own inline code (by hash) and that one API host. If you edit an inline style or script block, regenerate its hash.
+        -->
 
-<meta name="description" content="Swipe through random colours with names, hex and RGBA codes. Every one passes WCAG 2.1 and 2.2 AA contrast. Keep the ones you like, veto the rest.">
-<meta name="author" content="Nuadyr">
-<meta name="application-name" content="Dathanna">
-<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f3f5ef" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e1511" media="(prefers-color-scheme: dark)">
-<link rel="canonical" href="https://nuadyr.github.io/Dathanna/">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317261f'/%3E%3Cpath d='M8 24V8l8 9 8-9v16' fill='none' stroke='%23f4f7f1' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Dathanna">
-<meta property="og:title" content="Dathanna: swipe to find colours that pass WCAG AA">
-<meta property="og:description" content="Swipe right to keep a colour, left to veto it. Every colour passes AA contrast.">
-<meta property="og:url" content="https://nuadyr.github.io/Dathanna/">
-<meta property="og:locale" content="en_GB">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Dathanna: swipe to find colours that pass WCAG AA">
-<meta name="twitter:description" content="Swipe right to keep a colour, left to veto it. Every colour passes AA contrast.">
-<script type="application/ld+json">
+        <meta name="description" content="Swipe through random colours with names, hex and RGBA codes. Every one passes WCAG 2.1 and 2.2 AA contrast. Keep the ones you like, veto the rest.">
+        <meta name="author" content="Nuadyr">
+        <meta name="application-name" content="Dathanna">
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+        <meta name="color-scheme" content="light dark">
+        <meta
+            name="theme-color"
+            content="#f3f5ef"
+            media="(prefers-color-scheme: light)"
+        >
+        <meta
+            name="theme-color"
+            content="#0e1511"
+            media="(prefers-color-scheme: dark)"
+        >
+        <link rel="canonical" href="https://nuadyr.github.io/Dathanna/">
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317261f'/%3E%3Cpath d='M8 24V8l8 9 8-9v16' fill='none' stroke='%23f4f7f1' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E"
+        >
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="Dathanna">
+        <meta property="og:title" content="Dathanna: swipe to find colours that pass WCAG AA">
+        <meta property="og:description" content="Swipe right to keep a colour, left to veto it. Every colour passes AA contrast.">
+        <meta property="og:url" content="https://nuadyr.github.io/Dathanna/">
+        <meta property="og:locale" content="en_GB">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Dathanna: swipe to find colours that pass WCAG AA">
+        <meta name="twitter:description" content="Swipe right to keep a colour, left to veto it. Every colour passes AA contrast.">
+        <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -47,14 +59,14 @@
   "isAccessibleForFree": true,
   "author": { "@type": "Person", "name": "Nuadyr" }
 }
-</script>
-<script>
+        </script>
+        <script>
 /* One-time move of data saved under the old name (Spectrum) to the new keys, so nobody loses their library, vetoes or settings. */
-try { ['theme', 'theme-mode', 'motion-paused', 'library', 'blacklist', 'settings', 'name-cache'].forEach((k) => { const old = localStorage.getItem('spectrum-' + k); if (old === null) return; if (localStorage.getItem('dathanna-' + k) === null) localStorage.setItem('dathanna-' + k, old); localStorage.removeItem('spectrum-' + k); }); } catch { /* storage unavailable */ }
+try { ['theme', 'theme-mode', 'motion-paused', 'library', 'blacklist', 'settings', 'name-cache'].forEach((k) => { const old = localStorage.getItem('spectrum-' + k); if (old === null) {return;} if (localStorage.getItem('dathanna-' + k) === null) {localStorage.setItem('dathanna-' + k, old);} localStorage.removeItem('spectrum-' + k); }); } catch { /* storage unavailable */ }
 /* Apply a saved theme before first paint so there is no flash. */
-try { const t = localStorage.getItem('dathanna-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch { /* storage unavailable */ }
-</script>
-<style>
+try { const t = localStorage.getItem('dathanna-theme'); if (t === 'light' || t === 'dark') {document.documentElement.dataset.theme = t;} } catch { /* storage unavailable */ }
+        </script>
+        <style>
 /* Design system layers: 1 tokens, 2 base, 3 layout, 4 components, 5 your page, 6 user preferences and assistive modes. */
 :root {
   color-scheme: light dark;
@@ -610,389 +622,1258 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
 }
 
 /* 6. User preferences and assistive modes */
-</style>
-</head>
-<body>
-<a class="skip-link" href="#main">Skip to main content</a>
+        </style>
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to main content</a>
 
-<main id="main" tabindex="-1">
-  <header class="site-header">
-    <h1>Dathanna</h1>
-    <p id="save-error" role="alert" hidden></p>
-    <p class="lede">Swipe through random colours. Every one passes WCAG AA contrast, comes with its closest name, and is yours to keep or veto.</p>
-    <div class="row no-print">
-      <button type="button" data-open-explorer>Explore the colours</button>
-      <button id="theme-toggle" type="button" class="secondary">Theme: Auto</button>
-      <button id="motion-toggle" type="button" class="secondary" aria-pressed="false">Pause motion</button>
-    </div>
-  </header>
+        <main id="main" tabindex="-1">
+            <header class="site-header">
+                <h1>Dathanna</h1>
+                <p
+                    id="save-error"
+                    role="alert"
+                    hidden
+                ></p>
+                <p class="lede">Swipe through random colours. Every one passes WCAG AA contrast, comes with its closest name, and is yours to keep or veto.</p>
+                <div class="row no-print">
+                    <button type="button" data-open-explorer>Explore the colours</button>
+                    <button
+                        id="theme-toggle"
+                        type="button"
+                        class="secondary"
+                    >Theme: Auto</button>
+                    <button
+                        id="motion-toggle"
+                        type="button"
+                        class="secondary"
+                        aria-pressed="false"
+                    >Pause motion</button>
+                </div>
+            </header>
 
-  <noscript><p role="alert">Dathanna needs JavaScript. Enable it and reload.</p></noscript>
+            <noscript>
+                <p role="alert">Dathanna needs JavaScript. Enable it and reload.</p>
+            </noscript>
 
-  <div class="stack-lg">
+            <div class="stack-lg">
 
-    <div class="no-print">
-      <div class="tablist" role="tablist" aria-label="Sections">
-        <button id="tab-home" type="button" role="tab" aria-selected="true" aria-controls="panel-home">Explore</button>
-        <button id="tab-lib" type="button" role="tab" aria-selected="false" aria-controls="panel-lib" tabindex="-1">Library <span id="tab-count"></span></button>
-        <button id="tab-theme" type="button" role="tab" aria-selected="false" aria-controls="panel-theme" tabindex="-1">Theme Builder</button>
-      </div>
-    </div>
+                <div class="no-print">
+                    <div
+                        class="tablist"
+                        role="tablist"
+                        aria-label="Sections"
+                    >
+                        <button
+                            id="tab-home"
+                            type="button"
+                            role="tab"
+                            aria-selected="true"
+                            aria-controls="panel-home"
+                        >Explore</button>
+                        <button
+                            id="tab-lib"
+                            type="button"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="panel-lib"
+                            tabindex="-1"
+                        >Library <span id="tab-count"></span></button>
+                        <button
+                            id="tab-theme"
+                            type="button"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="panel-theme"
+                            tabindex="-1"
+                        >Theme Builder</button>
+                    </div>
+                </div>
 
-    <p id="lib-status" role="status"></p>
-    <p id="lib-error" role="alert" hidden></p>
+                <p id="lib-status" role="status"></p>
+                <p
+                    id="lib-error"
+                    role="alert"
+                    hidden
+                ></p>
 
-    <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" class="stack-lg">
+                <div
+                    id="panel-home"
+                    role="tabpanel"
+                    aria-labelledby="tab-home"
+                    class="stack-lg"
+                >
 
-    <section class="panel" aria-labelledby="recent-heading">
-      <h2 id="recent-heading" tabindex="-1">Recently added</h2>
+                    <section class="panel" aria-labelledby="recent-heading">
+                        <h2 id="recent-heading" tabindex="-1">Recently added</h2>
 
-      <div id="recent-empty" class="empty">
-        <p>Nothing kept yet. Start exploring to find colours worth keeping. Swipe right to keep one, left to veto it for good.</p>
-        <button type="button" data-open-explorer>Explore the colours</button>
-      </div>
+                        <div id="recent-empty" class="empty">
+                            <p>Nothing kept yet. Start exploring to find colours worth keeping. Swipe right to keep one, left to veto it for good.</p>
+                            <button type="button" data-open-explorer>Explore the colours</button>
+                        </div>
 
-      <div id="recent-full" class="stack" hidden>
-        <div class="stack">
-          <h3 id="recent-white-h">On white <span id="recent-white-n" class="hint"></span></h3>
-          <ul id="recent-white" class="tiles tiles--recent" aria-labelledby="recent-white-h" hidden></ul>
-          <p id="recent-white-empty" class="hint">Nothing kept on white yet.</p>
-        </div>
-        <div class="stack">
-          <h3 id="recent-black-h">On black <span id="recent-black-n" class="hint"></span></h3>
-          <ul id="recent-black" class="tiles tiles--recent" aria-labelledby="recent-black-h" hidden></ul>
-          <p id="recent-black-empty" class="hint">Nothing kept on black yet.</p>
-        </div>
-        <div class="row">
-          <button type="button" data-open-explorer>Explore more</button>
-          <button id="view-library" type="button" class="secondary">Open the library</button>
-        </div>
-      </div>
-    </section>
+                        <div
+                            id="recent-full"
+                            class="stack"
+                            hidden
+                        >
+                            <div class="stack">
+                                <h3 id="recent-white-h">On white <span id="recent-white-n" class="hint"></span></h3>
+                                <ul
+                                    id="recent-white"
+                                    class="tiles tiles--recent"
+                                    aria-labelledby="recent-white-h"
+                                    hidden
+                                ></ul>
+                                <p id="recent-white-empty" class="hint">Nothing kept on white yet.</p>
+                            </div>
+                            <div class="stack">
+                                <h3 id="recent-black-h">On black <span id="recent-black-n" class="hint"></span></h3>
+                                <ul
+                                    id="recent-black"
+                                    class="tiles tiles--recent"
+                                    aria-labelledby="recent-black-h"
+                                    hidden
+                                ></ul>
+                                <p id="recent-black-empty" class="hint">Nothing kept on black yet.</p>
+                            </div>
+                            <div class="row">
+                                <button type="button" data-open-explorer>Explore more</button>
+                                <button
+                                    id="view-library"
+                                    type="button"
+                                    class="secondary"
+                                >Open the library</button>
+                            </div>
+                        </div>
+                    </section>
 
-    <section class="panel" aria-labelledby="set-heading">
-      <h2 id="set-heading">Explore settings</h2>
-      <fieldset class="stack">
-        <legend>Check contrast against</legend>
-        <label class="checkline" for="bg-white"><input type="radio" name="bg" id="bg-white" value="white"> White (#FFFFFF), for colours used on light pages</label>
-        <label class="checkline" for="bg-black"><input type="radio" name="bg" id="bg-black" value="black"> Black (#000000), for colours used on dark pages</label>
-        <p class="hint">Each colour is fully opaque and must reach 4.5:1 against the backdrop. That is the AA minimum for text in both WCAG 2.1 and 2.2 (success criterion 1.4.3), and it also clears the 3:1 needed for icons and control edges.</p>
-      </fieldset>
-      <label class="checkline" for="opt-safe"><input type="checkbox" id="opt-safe"> Web-safe channel values only (red, green and blue each use 0, 51, 102, 153, 204 or 255)</label>
-      <label class="checkline" for="opt-online"><input type="checkbox" id="opt-online"> Look up colour names online</label>
-      <p class="hint">Off by default. When on, the colour you see is sent as a hex code to the Color Name API (api.color.pizza), which matches it against about 32,000 names. Like any web request, this also shares your IP address with that service. Nothing else is sent. When off, or when the lookup fails, Dathanna uses a built-in list of CSS colour names.</p>
-      <p id="names-status" role="status"></p>
-      <p class="hint">Changes apply to the next colour you see.</p>
-    </section>
+                    <section class="panel" aria-labelledby="set-heading">
+                        <h2 id="set-heading">Explore settings</h2>
+                        <fieldset class="stack">
+                            <legend>Check contrast against</legend>
+                            <label class="checkline" for="bg-white">
+                                <input
+                                    type="radio"
+                                    name="bg"
+                                    id="bg-white"
+                                    value="white"
+                                >
+                                White (#FFFFFF), for colours used on light pages
+                            </label>
+                            <label class="checkline" for="bg-black">
+                                <input
+                                    type="radio"
+                                    name="bg"
+                                    id="bg-black"
+                                    value="black"
+                                >
+                                Black (#000000), for colours used on dark pages
+                            </label>
+                            <p class="hint">Each colour is fully opaque and must reach 4.5:1 against the backdrop. That is the AA minimum for text in both WCAG 2.1 and 2.2 (success criterion 1.4.3), and it also clears the 3:1 needed for icons and control edges.</p>
+                        </fieldset>
+                        <label class="checkline" for="opt-safe">
+                            <input type="checkbox" id="opt-safe">
+                            Web-safe channel values only (red, green and blue each use 0, 51, 102, 153, 204 or 255)
+                        </label>
+                        <label class="checkline" for="opt-online">
+                            <input type="checkbox" id="opt-online">
+                            Look up colour names online
+                        </label>
+                        <p class="hint">Off by default. When on, the colour you see is sent as a hex code to the Color Name API (api.color.pizza), which matches it against about 32,000 names. Like any web request, this also shares your IP address with that service. Nothing else is sent. When off, or when the lookup fails, Dathanna uses a built-in list of CSS colour names.</p>
+                        <p id="names-status" role="status"></p>
+                        <p class="hint">Changes apply to the next colour you see.</p>
+                    </section>
 
-    <section class="stack span-all" aria-labelledby="veto-heading">
-      <h2 id="veto-heading">Vetoed colours <span id="veto-count" class="hint"></span></h2>
-      <details id="veto-box">
-        <summary>Show or hide vetoed colours</summary>
-        <p class="hint">A veto belongs to the backdrop it was made on. That colour, and any that look almost the same on that backdrop, will not come back there. It can still appear on the other backdrop.</p>
-        <ul id="veto-list" class="veto-list"></ul>
-        <p id="veto-empty">Nothing vetoed yet.</p>
-        <div class="row"><button id="veto-clear" type="button" class="secondary">Clear all vetoes</button></div>
-        <p id="veto-status" role="status"></p>
-      </details>
-    </section>
+                    <section class="stack span-all" aria-labelledby="veto-heading">
+                        <h2 id="veto-heading">Vetoed colours <span id="veto-count" class="hint"></span></h2>
+                        <details id="veto-box">
+                            <summary>Show or hide vetoed colours</summary>
+                            <p class="hint">A veto belongs to the backdrop it was made on. That colour, and any that look almost the same on that backdrop, will not come back there. It can still appear on the other backdrop.</p>
+                            <ul id="veto-list" class="veto-list"></ul>
+                            <p id="veto-empty">Nothing vetoed yet.</p>
+                            <div class="row">
+                                <button
+                                    id="veto-clear"
+                                    type="button"
+                                    class="secondary"
+                                >Clear all vetoes</button>
+                            </div>
+                            <p id="veto-status" role="status"></p>
+                        </details>
+                    </section>
 
-    <section class="stack span-all about" aria-labelledby="about-heading">
-      <h2 id="about-heading">About Dathanna</h2>
-      <p>Dathanna is a small colour explorer by Nuadyr. It picks fully opaque red, green and blue values at random using your browser’s secure random source, keeps only the ones that pass AA contrast, and names each with its closest CSS colour name. Online lookup of richer names is optional and off by default.</p>
-      <p>Prefer not to swipe? Every card has Keep and Veto buttons, and the left and right arrow keys work too. Your library and vetoes are saved only in this browser. The only thing that leaves it is the hex code of a colour being named, and only while online names are on.</p>
-    </section>
+                    <section class="stack span-all about" aria-labelledby="about-heading">
+                        <h2 id="about-heading">About Dathanna</h2>
+                        <p>Dathanna is a small colour explorer by Nuadyr. It picks fully opaque red, green and blue values at random using your browser’s secure random source, keeps only the ones that pass AA contrast, and names each with its closest CSS colour name. Online lookup of richer names is optional and off by default.</p>
+                        <p>Prefer not to swipe? Every card has Keep and Veto buttons, and the left and right arrow keys work too. Your library and vetoes are saved only in this browser. The only thing that leaves it is the hex code of a colour being named, and only while online names are on.</p>
+                    </section>
 
-    </div>
+                </div>
 
-    <section id="panel-lib" role="tabpanel" aria-labelledby="tab-lib" class="panel" hidden>
-      <h2 id="lib-heading" tabindex="-1">Library <span id="lib-count" class="hint"></span></h2>
+                <section
+                    id="panel-lib"
+                    role="tabpanel"
+                    aria-labelledby="tab-lib"
+                    class="panel"
+                    hidden
+                >
+                    <h2 id="lib-heading" tabindex="-1">Library <span id="lib-count" class="hint"></span></h2>
 
-      <div id="lib-empty" class="empty">
-        <p>Your library is empty. Start exploring to find colours worth keeping. Swipe right to keep one, left to veto it for good.</p>
-        <button type="button" data-open-explorer>Explore the colours</button>
-      </div>
+                    <div id="lib-empty" class="empty">
+                        <p>Your library is empty. Start exploring to find colours worth keeping. Swipe right to keep one, left to veto it for good.</p>
+                        <button type="button" data-open-explorer>Explore the colours</button>
+                    </div>
 
-      <div id="lib-full" class="stack" hidden>
-        <p class="hint">Colours are filed under the backdrop they were kept on. A colour kept on white can still be offered again on black, and the other way round. Select a colour to see its details.</p>
-        <div class="libsearch no-print">
-          <label for="lib-q"><strong>Search the library by colour</strong></label>
-          <div class="libsearch__field">
-            <input id="lib-q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="white, light blue, ff8800" aria-describedby="lib-q-hint lib-q-status">
-            <button id="lib-q-clear" type="button" class="secondary" hidden>Clear search</button>
-          </div>
-          <p id="lib-q-hint" class="hint">Type a colour name (rough spelling is fine) or a hex code. Your search becomes a hex code, and the 30 nearest kept colours are shown on white and again on black. Every kept colour is checked on both, wherever you kept it. Clear the box to see the whole library again.</p>
-          <p id="lib-q-status" class="libsearch__info" role="status"></p>
-        </div>
-        <div class="row">
-          <button type="button" data-open-explorer>Explore more</button>
-          <button id="lib-css" type="button" class="secondary">Copy all as CSS</button>
-          <button id="lib-clear" type="button" class="secondary">Clear library</button>
-        </div>
-        <div class="stack">
-          <h3 id="lib-white-h">On white <span id="lib-white-n" class="hint"></span></h3>
-          <ul id="lib-white" class="tiles tiles--lib" aria-labelledby="lib-white-h" hidden></ul>
-          <p id="lib-white-empty" class="hint">Nothing kept on white yet.</p>
-        </div>
-        <div class="stack">
-          <h3 id="lib-black-h">On black <span id="lib-black-n" class="hint"></span></h3>
-          <ul id="lib-black" class="tiles tiles--lib" aria-labelledby="lib-black-h" hidden></ul>
-          <p id="lib-black-empty" class="hint">Nothing kept on black yet.</p>
-        </div>
-      </div>
-    </section>
+                    <div
+                        id="lib-full"
+                        class="stack"
+                        hidden
+                    >
+                        <p class="hint">Colours are filed under the backdrop they were kept on. A colour kept on white can still be offered again on black, and the other way round. Select a colour to see its details.</p>
+                        <div class="libsearch no-print">
+                            <label for="lib-q"><strong>Search the library by colour</strong></label>
+                            <div class="libsearch__field">
+                                <input
+                                    id="lib-q"
+                                    type="search"
+                                    autocomplete="off"
+                                    autocapitalize="off"
+                                    spellcheck="false"
+                                    enterkeyhint="search"
+                                    placeholder="white, light blue, ff8800"
+                                    aria-describedby="lib-q-hint lib-q-status"
+                                >
+                                <button
+                                    id="lib-q-clear"
+                                    type="button"
+                                    class="secondary"
+                                    hidden
+                                >Clear search</button>
+                            </div>
+                            <p id="lib-q-hint" class="hint">Type a colour name (rough spelling is fine) or a hex code. Your search becomes a hex code, and the 30 nearest kept colours are shown on white and again on black. Every kept colour is checked on both, wherever you kept it. Clear the box to see the whole library again.</p>
+                            <p
+                                id="lib-q-status"
+                                class="libsearch__info"
+                                role="status"
+                            ></p>
+                        </div>
+                        <div class="row">
+                            <button type="button" data-open-explorer>Explore more</button>
+                            <button
+                                id="lib-css"
+                                type="button"
+                                class="secondary"
+                            >Copy all as CSS</button>
+                            <button
+                                id="lib-clear"
+                                type="button"
+                                class="secondary"
+                            >Clear library</button>
+                        </div>
+                        <div class="stack">
+                            <h3 id="lib-white-h">On white <span id="lib-white-n" class="hint"></span></h3>
+                            <ul
+                                id="lib-white"
+                                class="tiles tiles--lib"
+                                aria-labelledby="lib-white-h"
+                                hidden
+                            ></ul>
+                            <p id="lib-white-empty" class="hint">Nothing kept on white yet.</p>
+                        </div>
+                        <div class="stack">
+                            <h3 id="lib-black-h">On black <span id="lib-black-n" class="hint"></span></h3>
+                            <ul
+                                id="lib-black"
+                                class="tiles tiles--lib"
+                                aria-labelledby="lib-black-h"
+                                hidden
+                            ></ul>
+                            <p id="lib-black-empty" class="hint">Nothing kept on black yet.</p>
+                        </div>
+                    </div>
+                </section>
 
-    <section id="panel-theme" role="tabpanel" aria-labelledby="tab-theme" class="panel" hidden>
-      <h2 id="theme-heading" tabindex="-1">Theme Builder</h2>
-      <p class="hint">Select a CSS variable above the preview, or tap a part of the preview, then pick a colour for it from your library. Every variable except the page background also has an opacity slider in the picker. Checks use WCAG AA, and a translucent colour is checked as it looks over the page or card behind it. Disabled controls are exempt from contrast rules, so only placeholder and struck-through text are checked.</p>
-      <div class="tb-layout">
-        <div class="tb-controls stack">
-          <div class="stack"><h3>Contrast checks</h3><p id="tb-summary" class="hint"></p><ul id="tb-checks" class="tb-checks"></ul></div>
-          <div class="row"><button id="tb-copy" type="button">Copy as CSS</button></div>
-          <p id="tb-status" role="status"></p>
-        </div>
-        <div class="tb-main">
-          <div class="row">
-            <button id="tb-light" type="button" class="secondary">Light preset</button>
-            <button id="tb-dark" type="button" class="secondary">Dark preset</button>
-            <button id="tb-swap" type="button" class="secondary">Swap page and text</button>
-          </div>
-          <p id="tb-mode" class="hint"></p>
-          <div class="tb-vars">
-            <h3 id="tb-vars-h">CSS variables</h3>
-            <div id="tb-roles" class="tb-roles" role="group" aria-labelledby="tb-vars-h"></div>
-          </div>
-        <div id="tb" class="tb" data-role="bg" role="img" aria-label="Preview of a web page using the theme">
-          <header class="tb-nav" data-role="surface" role="none">
-            <span class="tb-logo" data-role="text">Northwind</span>
-            <nav class="tb-navbar" aria-label="Preview navigation"><ul class="tb-links"><li><a class="tb-link" data-role="primary" href="#tb">Products</a></li><li><a class="tb-link" data-role="primary" href="#tb">Pricing</a></li><li><a class="tb-link" data-role="primary" href="#tb">Docs</a></li></ul></nav>
-            <search class="tb-search"><label class="visually-hidden" for="tb-site-q">Search the site</label><input id="tb-site-q" class="tb-input" data-role="bg" type="search" placeholder="Search" readonly><button class="tb-btn" data-role="primary" data-text-role="onPrimary" type="button">Search</button></search>
-          </header>
-          <div class="tb-page">
-            <section class="tb-hero">
-              <span class="tb-badge" data-role="accent" data-text-role="onAccent">New release</span>
-              <p class="tb-h1" data-role="text">Build pages people love to read</p>
-              <p class="tb-m" data-role="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-              <div class="tb-row"><button class="tb-btn" data-role="primary" data-text-role="onPrimary" type="button">Get started</button><button class="tb-btn tb-btn--o" data-role="primary" type="button">Learn more</button><button class="tb-btn" data-role="disabled" type="button" disabled>Unavailable</button></div>
-            </section>
-            <hr class="tb-hr" data-role="border">
-            <section class="tb-sec">
-              <p class="tb-h2" data-role="text">Features</p>
-              <div class="tb-grid">
-                <article class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Fast setup</p><p class="tb-m" data-role="muted">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p><a class="tb-link" data-role="primary" href="#tb">Read more</a></article>
-                <article class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Accessible</p><p class="tb-m" data-role="muted">Duis aute irure dolor in reprehenderit in voluptate velit esse.</p><a class="tb-link" data-role="primary" href="#tb">Read more</a></article>
-                <article class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Made to scale</p><p class="tb-m" data-role="muted">Excepteur sint occaecat cupidatat non proident, sunt in culpa.</p><a class="tb-link" data-role="primary" href="#tb">Read more</a></article>
-              </div>
-            </section>
-            <section class="tb-sec tb-two">
-              <figure class="tb-fig"><img id="tb-img" class="tb-img" data-role="surface" width="320" height="180" alt="Sample picture of hills and a sun" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'%3E%3C/svg%3E"><figcaption class="tb-cap tb-m" data-role="muted">Figure 1. A sample picture.</figcaption></figure>
-              <figure class="tb-fig"><canvas id="tb-canvas" class="tb-canvas" data-role="surface" width="960" height="320">A sample bar chart.</canvas><figcaption class="tb-cap tb-m" data-role="muted">Figure 2. A sample chart.</figcaption></figure>
-            </section>
-            <section class="tb-sec tb-two">
-              <article class="tb-card tb-prose" data-role="surface">
-                <p class="tb-h3" data-role="text">Colour you can read</p>
-                <p class="tb-m" data-role="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                <p class="tb-m" data-role="muted">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-              </article>
-              <figure class="tb-quotefig">
-                <blockquote class="tb-quote" data-role="text"><p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p></blockquote>
-                <figcaption class="tb-cap tb-m" data-role="muted">A sample author, <cite>Sample Book</cite></figcaption>
-              </figure>
-            </section>
-            <section class="tb-sec tb-two">
-              <div class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Unordered list</p><ul class="tb-list" data-role="text"><li>Lorem ipsum dolor</li><li>Sit amet consectetur<ul><li>Nested item</li><li>Another nested item</li></ul></li><li>Adipiscing elit</li></ul></div>
-              <div class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Ordered list</p><ol class="tb-list" data-role="text"><li>Choose a colour</li><li>Check the contrast<ol><li>Text</li><li>Controls</li></ol></li><li>Copy the CSS</li></ol></div>
-              <div class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Menu</p><menu class="tb-menu"><li><button class="tb-btn tb-btn--o" data-role="primary" type="button">Copy</button></li><li><button class="tb-btn tb-btn--o" data-role="primary" type="button">Paste</button></li><li><button class="tb-btn tb-btn--o" data-role="primary" type="button">Undo</button></li></menu></div>
-              <div class="tb-card" data-role="surface"><p class="tb-h3" data-role="text">Definitions</p><dl class="tb-dl"><div><dt data-role="text">Contrast</dt><dd class="tb-m" data-role="muted">The difference in light between two colours.</dd></div><div><dt data-role="text">Opacity</dt><dd class="tb-m" data-role="muted">How much of the backdrop shows through.</dd></div></dl></div>
-            </section>
-            <section class="tb-sec tb-two">
-              <div>
-                <details class="tb-details" data-role="surface" open><summary data-role="text">What does AA mean?</summary><p class="tb-m" data-role="muted">It is the middle conformance level of WCAG: 4.5:1 for normal text and 3:1 for large text and interface parts.</p></details>
-                <details class="tb-details" data-role="surface"><summary data-role="text">Can I change it later?</summary><p class="tb-m" data-role="muted">Yes. Pick any variable again and choose another colour.</p></details>
-              </div>
-              <div class="tb-card" data-role="surface">
-                <aside class="tb-alert" role="note" data-role="surface"><p class="tb-h3" data-role="text">Heads up</p><p class="tb-m" data-role="muted">Sed ut perspiciatis unde omnis iste natus error sit voluptatem.</p><a class="tb-link" data-role="primary" href="#tb">Dismiss</a></aside>
-                <dialog class="tb-dialog" open data-role="surface" aria-label="Example dialog"><p class="tb-h3" data-role="text">Save your changes?</p><p class="tb-m" data-role="muted">Your theme has not been copied yet.</p><div class="tb-row"><button class="tb-btn" data-role="primary" data-text-role="onPrimary" type="button">Save</button><button class="tb-btn tb-btn--o" data-role="primary" type="button">Cancel</button></div></dialog>
-              </div>
-            </section>
-            <section class="tb-sec tb-two">
-              <article class="tb-card" data-role="surface">
-                <p class="tb-h3" data-role="text">Inline text</p>
-                <p data-role="text"><strong>Bold</strong>, <em>italic</em>, a <a class="tb-link" data-role="primary" href="#tb">link</a>, <a class="tb-link tb-link--visited" data-role="visited" href="#tb">visited</a>, <mark data-role="accent" data-text-role="onAccent">highlighted</mark>, <code data-role="bg">code</code>, <kbd data-role="bg">Ctrl</kbd> + <kbd data-role="bg">C</kbd>, <abbr title="Web Content Accessibility Guidelines">WCAG</abbr>, <time datetime="2026-10-22">22 Oct 2026</time>, H<sub>2</sub>O, x<sup>2</sup>, <ins>added</ins>, <del data-role="disabled">removed</del>, <s data-role="disabled">struck</s>, <q>quoted</q>, <var>n</var>, <samp data-role="bg">output</samp> and <small data-role="muted">small print</small>.</p>
+                <section
+                    id="panel-theme"
+                    role="tabpanel"
+                    aria-labelledby="tab-theme"
+                    class="panel"
+                    hidden
+                >
+                    <h2 id="theme-heading" tabindex="-1">Theme Builder</h2>
+                    <p class="hint">Select a CSS variable above the preview, or tap a part of the preview, then pick a colour for it from your library. Every variable except the page background also has an opacity slider in the picker. Checks use WCAG AA, and a translucent colour is checked as it looks over the page or card behind it. Disabled controls are exempt from contrast rules, so only placeholder and struck-through text are checked.</p>
+                    <div class="tb-layout">
+                        <div class="tb-controls stack">
+                            <div class="stack">
+                                <h3>Contrast checks</h3>
+                                <p id="tb-summary" class="hint"></p>
+                                <ul id="tb-checks" class="tb-checks"></ul>
+                            </div>
+                            <div class="row">
+                                <button id="tb-copy" type="button">Copy as CSS</button>
+                            </div>
+                            <p id="tb-status" role="status"></p>
+                        </div>
+                        <div class="tb-main">
+                            <div class="row">
+                                <button
+                                    id="tb-light"
+                                    type="button"
+                                    class="secondary"
+                                >Light preset</button>
+                                <button
+                                    id="tb-dark"
+                                    type="button"
+                                    class="secondary"
+                                >Dark preset</button>
+                                <button
+                                    id="tb-swap"
+                                    type="button"
+                                    class="secondary"
+                                >Swap page and text</button>
+                            </div>
+                            <p id="tb-mode" class="hint"></p>
+                            <div class="tb-vars">
+                                <h3 id="tb-vars-h">CSS variables</h3>
+                                <div
+                                    id="tb-roles"
+                                    class="tb-roles"
+                                    role="group"
+                                    aria-labelledby="tb-vars-h"
+                                ></div>
+                            </div>
+                            <div
+                                id="tb"
+                                class="tb"
+                                data-role="bg"
+                                role="img"
+                                aria-label="Preview of a web page using the theme"
+                            >
+                                <header
+                                    class="tb-nav"
+                                    data-role="surface"
+                                    role="none"
+                                >
+                                    <span class="tb-logo" data-role="text">Northwind</span>
+                                    <nav class="tb-navbar" aria-label="Preview navigation">
+                                        <ul class="tb-links">
+                                            <li><a
+                                                    class="tb-link"
+                                                    data-role="primary"
+                                                    href="#tb"
+                                                >Products</a></li>
+                                            <li><a
+                                                    class="tb-link"
+                                                    data-role="primary"
+                                                    href="#tb"
+                                                >Pricing</a></li>
+                                            <li><a
+                                                    class="tb-link"
+                                                    data-role="primary"
+                                                    href="#tb"
+                                                >Docs</a></li>
+                                        </ul>
+                                    </nav>
+                                    <search class="tb-search">
+                                        <label class="visually-hidden" for="tb-site-q">Search the site</label>
+                                        <input
+                                            id="tb-site-q"
+                                            class="tb-input"
+                                            data-role="bg"
+                                            type="search"
+                                            placeholder="Search"
+                                            readonly
+                                        >
+                                        <button
+                                            class="tb-btn"
+                                            data-role="primary"
+                                            data-text-role="onPrimary"
+                                            type="button"
+                                        >Search</button>
+                                    </search>
+                                </header>
+                                <div class="tb-page">
+                                    <section class="tb-hero">
+                                        <span
+                                            class="tb-badge"
+                                            data-role="accent"
+                                            data-text-role="onAccent"
+                                        >New release</span>
+                                        <p class="tb-h1" data-role="text">Build pages people love to read</p>
+                                        <p class="tb-m" data-role="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                        <div class="tb-row">
+                                            <button
+                                                class="tb-btn"
+                                                data-role="primary"
+                                                data-text-role="onPrimary"
+                                                type="button"
+                                            >Get started</button>
+                                            <button
+                                                class="tb-btn tb-btn--o"
+                                                data-role="primary"
+                                                type="button"
+                                            >Learn more</button>
+                                            <button
+                                                class="tb-btn"
+                                                data-role="disabled"
+                                                type="button"
+                                                disabled
+                                            >Unavailable</button>
+                                        </div>
+                                    </section>
+                                    <hr class="tb-hr" data-role="border">
+                                    <section class="tb-sec">
+                                        <p class="tb-h2" data-role="text">Features</p>
+                                        <div class="tb-grid">
+                                            <article class="tb-card" data-role="surface">
+                                                <p class="tb-h3" data-role="text">Fast setup</p>
+                                                <p class="tb-m" data-role="muted">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                                                <a
+                                                    class="tb-link"
+                                                    data-role="primary"
+                                                    href="#tb"
+                                                >Read more</a>
+                                            </article>
+                                            <article class="tb-card" data-role="surface">
+                                                <p class="tb-h3" data-role="text">Accessible</p>
+                                                <p class="tb-m" data-role="muted">Duis aute irure dolor in reprehenderit in voluptate velit esse.</p>
+                                                <a
+                                                    class="tb-link"
+                                                    data-role="primary"
+                                                    href="#tb"
+                                                >Read more</a>
+                                            </article>
+                                            <article class="tb-card" data-role="surface">
+                                                <p class="tb-h3" data-role="text">Made to scale</p>
+                                                <p class="tb-m" data-role="muted">Excepteur sint occaecat cupidatat non proident, sunt in culpa.</p>
+                                                <a
+                                                    class="tb-link"
+                                                    data-role="primary"
+                                                    href="#tb"
+                                                >Read more</a>
+                                            </article>
+                                        </div>
+                                    </section>
+                                    <section class="tb-sec tb-two">
+                                        <figure class="tb-fig">
+                                            <img
+                                                id="tb-img"
+                                                class="tb-img"
+                                                data-role="surface"
+                                                width="320"
+                                                height="180"
+                                                alt="Sample picture of hills and a sun"
+                                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'%3E%3C/svg%3E"
+                                            >
+                                            <figcaption class="tb-cap tb-m" data-role="muted">Figure 1. A sample picture.</figcaption>
+                                        </figure>
+                                        <figure class="tb-fig">
+                                            <canvas
+                                                id="tb-canvas"
+                                                class="tb-canvas"
+                                                data-role="surface"
+                                                width="960"
+                                                height="320"
+                                            >A sample bar chart.</canvas>
+                                            <figcaption class="tb-cap tb-m" data-role="muted">Figure 2. A sample chart.</figcaption>
+                                        </figure>
+                                    </section>
+                                    <section class="tb-sec tb-two">
+                                        <article class="tb-card tb-prose" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Colour you can read</p>
+                                            <p class="tb-m" data-role="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                            <p class="tb-m" data-role="muted">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                        </article>
+                                        <figure class="tb-quotefig">
+                                            <blockquote class="tb-quote" data-role="text">
+                                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
+                                            </blockquote>
+                                            <figcaption class="tb-cap tb-m" data-role="muted">A sample author, <cite>Sample Book</cite></figcaption>
+                                        </figure>
+                                    </section>
+                                    <section class="tb-sec tb-two">
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Unordered list</p>
+                                            <ul class="tb-list" data-role="text">
+                                                <li>Lorem ipsum dolor</li>
+                                                <li>
+                                                    Sit amet consectetur
+                                                    <ul>
+                                                        <li>Nested item</li>
+                                                        <li>Another nested item</li>
+                                                    </ul>
+                                                </li>
+                                                <li>Adipiscing elit</li>
+                                            </ul>
+                                        </div>
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Ordered list</p>
+                                            <ol class="tb-list" data-role="text">
+                                                <li>Choose a colour</li>
+                                                <li>
+                                                    Check the contrast
+                                                    <ol>
+                                                        <li>Text</li>
+                                                        <li>Controls</li>
+                                                    </ol>
+                                                </li>
+                                                <li>Copy the CSS</li>
+                                            </ol>
+                                        </div>
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Menu</p>
+                                            <menu class="tb-menu">
+                                                <li>
+                                                    <button
+                                                        class="tb-btn tb-btn--o"
+                                                        data-role="primary"
+                                                        type="button"
+                                                    >Copy</button>
+                                                </li>
+                                                <li>
+                                                    <button
+                                                        class="tb-btn tb-btn--o"
+                                                        data-role="primary"
+                                                        type="button"
+                                                    >Paste</button>
+                                                </li>
+                                                <li>
+                                                    <button
+                                                        class="tb-btn tb-btn--o"
+                                                        data-role="primary"
+                                                        type="button"
+                                                    >Undo</button>
+                                                </li>
+                                            </menu>
+                                        </div>
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Definitions</p>
+                                            <dl class="tb-dl">
+                                                <div>
+                                                    <dt data-role="text">Contrast</dt>
+                                                    <dd class="tb-m" data-role="muted">The difference in light between two colours.</dd>
+                                                </div>
+                                                <div>
+                                                    <dt data-role="text">Opacity</dt>
+                                                    <dd class="tb-m" data-role="muted">How much of the backdrop shows through.</dd>
+                                                </div>
+                                            </dl>
+                                        </div>
+                                    </section>
+                                    <section class="tb-sec tb-two">
+                                        <div>
+                                            <details
+                                                class="tb-details"
+                                                data-role="surface"
+                                                open
+                                            >
+                                                <summary data-role="text">What does AA mean?</summary>
+                                                <p class="tb-m" data-role="muted">It is the middle conformance level of WCAG: 4.5:1 for normal text and 3:1 for large text and interface parts.</p>
+                                            </details>
+                                            <details class="tb-details" data-role="surface">
+                                                <summary data-role="text">Can I change it later?</summary>
+                                                <p class="tb-m" data-role="muted">Yes. Pick any variable again and choose another colour.</p>
+                                            </details>
+                                        </div>
+                                        <div class="tb-card" data-role="surface">
+                                            <aside
+                                                class="tb-alert"
+                                                role="note"
+                                                data-role="surface"
+                                            >
+                                                <p class="tb-h3" data-role="text">Heads up</p>
+                                                <p class="tb-m" data-role="muted">Sed ut perspiciatis unde omnis iste natus error sit voluptatem.</p>
+                                                <a
+                                                    class="tb-link"
+                                                    data-role="primary"
+                                                    href="#tb"
+                                                >Dismiss</a>
+                                            </aside>
+                                            <dialog
+                                                class="tb-dialog"
+                                                open
+                                                data-role="surface"
+                                                aria-label="Example dialog"
+                                            >
+                                                <p class="tb-h3" data-role="text">Save your changes?</p>
+                                                <p class="tb-m" data-role="muted">Your theme has not been copied yet.</p>
+                                                <div class="tb-row">
+                                                    <button
+                                                        class="tb-btn"
+                                                        data-role="primary"
+                                                        data-text-role="onPrimary"
+                                                        type="button"
+                                                    >Save</button>
+                                                    <button
+                                                        class="tb-btn tb-btn--o"
+                                                        data-role="primary"
+                                                        type="button"
+                                                    >Cancel</button>
+                                                </div>
+                                            </dialog>
+                                        </div>
+                                    </section>
+                                    <section class="tb-sec tb-two">
+                                        <article class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Inline text</p>
+                                            <p data-role="text">
+                                                <strong>Bold</strong>, <em>italic</em>, a <a
+                                                    class="tb-link"
+                                                    data-role="primary"
+                                                    href="#tb"
+                                                >link</a>, <a
+                                                    class="tb-link tb-link--visited"
+                                                    data-role="visited"
+                                                    href="#tb"
+                                                >visited</a>, <mark data-role="accent" data-text-role="onAccent">highlighted</mark>, <code data-role="bg">code</code>, <kbd data-role="bg">Ctrl</kbd> + <kbd data-role="bg">C</kbd>, <abbr title="Web Content Accessibility Guidelines">WCAG</abbr>, <time datetime="2026-10-22">22 Oct 2026</time>, H<sub>2</sub>O, x<sup>2</sup>, 
+                                                <ins>added</ins>
+                                                , 
+                                                <del data-role="disabled">removed</del>
+                                                , <s data-role="disabled">struck</s>, <q>quoted</q>, <var>n</var>, <samp data-role="bg">output</samp> and <small data-role="muted">small print</small>.
+                                            </p>
                 <pre data-role="bg"><code>:root { --color-primary: #1d4ed8; }</code></pre>
-              </article>
-              <div class="tb-card" data-role="surface">
-                <p class="tb-h3" data-role="text">Navigation</p>
-                <nav aria-label="Breadcrumb"><ol class="tb-crumbs"><li><a class="tb-link" data-role="primary" href="#tb">Home</a></li><li><a class="tb-link" data-role="primary" href="#tb">Docs</a></li><li><span aria-current="page" data-role="muted">Themes</span></li></ol></nav>
-                <nav aria-label="Pagination"><ul class="tb-pager"><li><a class="tb-pg" data-role="primary" href="#tb">Prev</a></li><li><a class="tb-pg" data-role="primary" href="#tb">1</a></li><li><a class="tb-pg" data-role="primary" data-text-role="onPrimary" href="#tb" aria-current="page">2</a></li><li><a class="tb-pg" data-role="primary" href="#tb">3</a></li><li><a class="tb-pg" data-role="primary" href="#tb">Next</a></li></ul></nav>
-              </div>
-            </section>
-            <section class="tb-sec">
-              <div class="tb-tablewrap">
-                <table class="tb-table">
-                  <caption data-role="muted">Plans and pricing</caption>
-                  <colgroup><col class="tb-col-wide"><col><col></colgroup>
-                  <thead><tr><th scope="col" data-role="text">Plan</th><th scope="col" data-role="text">Seats</th><th scope="col" data-role="text">Price</th></tr></thead>
-                  <tbody>
-                    <tr><th scope="row" data-role="text">Starter</th><td data-role="text">5</td><td data-role="text">$9</td></tr>
-                    <tr><th scope="row" data-role="text">Team</th><td data-role="text">25</td><td data-role="text">$29</td></tr>
-                    <tr><th scope="row" data-role="text">Company</th><td data-role="text">100</td><td data-role="text">$99</td></tr>
-                  </tbody>
-                  <tfoot><tr><th scope="row" data-role="text">All plans</th><td data-role="text">130</td><td data-role="text">$137</td></tr></tfoot>
-                </table>
-              </div>
-            </section>
-            <section class="tb-sec tb-two">
-              <fieldset class="tb-card tb-fieldset" data-role="surface">
-                <legend class="tb-h3" data-role="text">Contact us</legend>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-email">Email address</label><input id="tb-email" class="tb-input" data-role="bg" type="email" value="name@example.com" readonly></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-msg">Message</label><textarea id="tb-msg" class="tb-input" data-role="bg" rows="3" placeholder="Write your message" readonly></textarea></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-plan">Plan</label><select id="tb-plan" class="tb-input" data-role="bg"><option>Starter</option><option selected>Team</option><option>Company</option></select></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-city">Nearest office</label><input id="tb-city" class="tb-input" data-role="bg" list="tb-cities" placeholder="Start typing a city" readonly><datalist id="tb-cities"><option value="Kyoto"></option><option value="Lima"></option><option value="Oslo"></option></datalist></div>
-                <div class="tb-choices"><label class="tb-choice" data-role="text"><input type="checkbox" data-role="primary" checked>Send me updates</label><label class="tb-choice" data-role="text"><input type="radio" data-role="primary" name="tb-reply" checked>By email</label><label class="tb-choice" data-role="text"><input type="radio" name="tb-reply">By phone</label></div>
-                <button class="tb-btn" data-role="primary" data-text-role="onPrimary" type="button">Send message</button>
-              </fieldset>
-              <div class="tb-card" data-role="surface">
-                <p class="tb-h3" data-role="text">Controls</p>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-extras">Extras</label><select id="tb-extras" class="tb-input tb-listbox" data-role="bg" multiple size="4"><optgroup label="Support"><option>Email</option><option selected>Chat</option></optgroup><optgroup label="Training"><option>Workshop</option><option selected>Webinar</option></optgroup></select></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-range">Volume</label><div class="tb-inline"><input id="tb-range" data-role="primary" type="range" min="0" max="100" value="60"><output class="tb-out" data-role="text" for="tb-range">60</output></div></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-meter">Storage used</label><meter id="tb-meter" data-role="accent" min="0" max="100" value="70">70%</meter></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-prog">Upload</label><progress id="tb-prog" data-role="accent" max="100" value="45">45%</progress></div>
-              </div>
-            </section>
-            <section class="tb-sec tb-two">
-              <div class="tb-card" data-role="surface">
-                <p class="tb-h3" data-role="text">Input types</p>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-pw">Password</label><input id="tb-pw" class="tb-input" data-role="bg" type="password" value="secret123" readonly></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-num">Quantity</label><input id="tb-num" class="tb-input" data-role="bg" type="number" value="3" readonly></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-date">Date</label><input id="tb-date" class="tb-input" data-role="bg" type="date" value="2026-10-22" readonly></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-file">Attachment</label><input id="tb-file" class="tb-input" data-role="bg" type="file"></div>
-              </div>
-              <div class="tb-card" data-role="surface">
-                <p class="tb-h3" data-role="text">Input states</p>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-bad">Email address</label><input id="tb-bad" class="tb-input" data-role="bg" type="email" value="name@" aria-invalid="true" aria-describedby="tb-bad-msg" readonly><p id="tb-bad-msg" class="tb-err" data-role="danger">Enter a valid email address.</p></div>
-                <div class="tb-field"><label class="tb-label" data-role="text" for="tb-off">Disabled field</label><input id="tb-off" class="tb-input" data-role="disabled" value="Not editable" disabled></div>
-                <div class="tb-choices"><label class="tb-choice" data-role="disabled"><input type="checkbox" disabled>Disabled checkbox</label><label class="tb-choice" data-role="disabled"><input type="radio" disabled>Disabled radio</label></div>
-              </div>
-            </section>
-            <section class="tb-sec tb-two">
-              <div class="tb-card" data-role="surface">
-                <p class="tb-h3" data-role="text">Status messages</p>
-                <p class="tb-msg tb-msg--danger" data-role="danger"><span class="tb-msg__i" aria-hidden="true">&#10005;</span>Payment failed. Check the card number.</p>
-                <p class="tb-msg tb-msg--success" data-role="success"><span class="tb-msg__i" aria-hidden="true">&#10003;</span>Your changes were saved.</p>
-                <p class="tb-msg tb-msg--warning" data-role="warning"><span class="tb-msg__i" aria-hidden="true">!</span>Your plan renews in 3 days.</p>
-              </div>
-              <div class="tb-card" data-role="surface">
-                <p class="tb-h3" data-role="text">Keyboard focus</p>
-                <div class="tb-row"><span class="tb-ringwrap" data-role="focus"><button class="tb-btn" type="button">Focused button</button></span><span class="tb-ringwrap" data-role="focus"><input class="tb-input" type="text" value="Focused field" aria-label="Focused field" readonly></span></div>
-              </div>
-            </section>
-          </div>
-          <hr class="tb-hr" data-role="border">
-          <footer class="tb-foot" data-role="surface" role="none">
-            <address class="tb-addr tb-m" data-role="muted">Northwind Ltd<br>12 Example Street, Sampletown<br><a class="tb-link" data-role="primary" href="#tb">hello@example.com</a></address>
-            <span data-role="muted">© 2026 Northwind. Lorem ipsum dolor sit amet.</span>
-            <ul class="tb-links"><li><a class="tb-link" data-role="primary" href="#tb">Privacy</a></li><li><a class="tb-link" data-role="primary" href="#tb">Terms</a></li></ul>
-          </footer>
-        </div>
-        <details>
-          <summary>Elements in the preview</summary>
-          <p class="hint">The preview uses real header, nav, search, section, article, aside, address, blockquote, figure, figcaption, details, summary, dialog, ul, ol, menu, li, dl, dt, dd, table, caption, colgroup, col, thead, tbody, tfoot, tr, th, td, fieldset, legend, label, input, textarea, select, optgroup, option, datalist, button, meter, progress, output, hr, img, canvas and footer elements, plus status messages, a focus ring, a visited link, inline text (strong, em, mark, code, kbd, samp, var, abbr, time, sub, sup, ins, del, s, q, small, pre), nested lists, breadcrumb and pagination navigation, and password, number, date and file inputs with invalid and disabled states. The preview frame stands in for body, and a plain div stands in for main, because this page already has its own main. A datalist has no box of its own and its suggestions are drawn by the browser, so the preview includes the input that uses it but cannot show or theme the list. The look of an open select and of the selected option in a list box is partly up to the browser. The picture and the chart are redrawn in your theme colours.</p>
-        </details>
-        </div>
-      </div>
-    </section>
-  </div>
-</main>
+                                        </article>
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Navigation</p>
+                                            <nav aria-label="Breadcrumb">
+                                                <ol class="tb-crumbs">
+                                                    <li><a
+                                                            class="tb-link"
+                                                            data-role="primary"
+                                                            href="#tb"
+                                                        >Home</a></li>
+                                                    <li><a
+                                                            class="tb-link"
+                                                            data-role="primary"
+                                                            href="#tb"
+                                                        >Docs</a></li>
+                                                    <li><span aria-current="page" data-role="muted">Themes</span></li>
+                                                </ol>
+                                            </nav>
+                                            <nav aria-label="Pagination">
+                                                <ul class="tb-pager">
+                                                    <li><a
+                                                            class="tb-pg"
+                                                            data-role="primary"
+                                                            href="#tb"
+                                                        >Prev</a></li>
+                                                    <li><a
+                                                            class="tb-pg"
+                                                            data-role="primary"
+                                                            href="#tb"
+                                                        >1</a></li>
+                                                    <li><a
+                                                            class="tb-pg"
+                                                            data-role="primary"
+                                                            data-text-role="onPrimary"
+                                                            href="#tb"
+                                                            aria-current="page"
+                                                        >2</a></li>
+                                                    <li><a
+                                                            class="tb-pg"
+                                                            data-role="primary"
+                                                            href="#tb"
+                                                        >3</a></li>
+                                                    <li><a
+                                                            class="tb-pg"
+                                                            data-role="primary"
+                                                            href="#tb"
+                                                        >Next</a></li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </section>
+                                    <section class="tb-sec">
+                                        <div class="tb-tablewrap">
+                                            <table class="tb-table">
+                                                <caption data-role="muted">Plans and pricing</caption>
+                                                <colgroup>
+                                                    <col class="tb-col-wide">
+                                                    <col>
+                                                    <col>
+                                                </colgroup>
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col" data-role="text">Plan</th>
+                                                        <th scope="col" data-role="text">Seats</th>
+                                                        <th scope="col" data-role="text">Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <th scope="row" data-role="text">Starter</th>
+                                                        <td data-role="text">5</td>
+                                                        <td data-role="text">$9</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row" data-role="text">Team</th>
+                                                        <td data-role="text">25</td>
+                                                        <td data-role="text">$29</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row" data-role="text">Company</th>
+                                                        <td data-role="text">100</td>
+                                                        <td data-role="text">$99</td>
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th scope="row" data-role="text">All plans</th>
+                                                        <td data-role="text">130</td>
+                                                        <td data-role="text">$137</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </section>
+                                    <section class="tb-sec tb-two">
+                                        <fieldset class="tb-card tb-fieldset" data-role="surface">
+                                            <legend class="tb-h3" data-role="text">Contact us</legend>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-email"
+                                                >Email address</label>
+                                                <input
+                                                    id="tb-email"
+                                                    class="tb-input"
+                                                    data-role="bg"
+                                                    type="email"
+                                                    value="name@example.com"
+                                                    readonly
+                                                >
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-msg"
+                                                >Message</label>
+                                                <textarea
+                                                    id="tb-msg"
+                                                    class="tb-input"
+                                                    data-role="bg"
+                                                    rows="3"
+                                                    placeholder="Write your message"
+                                                    readonly
+                                                ></textarea>
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-plan"
+                                                >Plan</label>
+                                                <select
+                                                    id="tb-plan"
+                                                    class="tb-input"
+                                                    data-role="bg"
+                                                >
+                                                    <option>Starter</option>
+                                                    <option selected>Team</option>
+                                                    <option>Company</option>
+                                                </select>
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-city"
+                                                >Nearest office</label>
+                                                <input
+                                                    id="tb-city"
+                                                    class="tb-input"
+                                                    data-role="bg"
+                                                    list="tb-cities"
+                                                    placeholder="Start typing a city"
+                                                    readonly
+                                                >
+                                                <datalist id="tb-cities">
+                                                    <option value="Kyoto"></option>
+                                                    <option value="Lima"></option>
+                                                    <option value="Oslo"></option>
+                                                </datalist>
+                                            </div>
+                                            <div class="tb-choices">
+                                                <label class="tb-choice" data-role="text">
+                                                    <input
+                                                        type="checkbox"
+                                                        data-role="primary"
+                                                        checked
+                                                    >
+                                                    Send me updates
+                                                </label>
+                                                <label class="tb-choice" data-role="text">
+                                                    <input
+                                                        type="radio"
+                                                        data-role="primary"
+                                                        name="tb-reply"
+                                                        checked
+                                                    >
+                                                    By email
+                                                </label>
+                                                <label class="tb-choice" data-role="text">
+                                                    <input type="radio" name="tb-reply">
+                                                    By phone
+                                                </label>
+                                            </div>
+                                            <button
+                                                class="tb-btn"
+                                                data-role="primary"
+                                                data-text-role="onPrimary"
+                                                type="button"
+                                            >Send message</button>
+                                        </fieldset>
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Controls</p>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-extras"
+                                                >Extras</label>
+                                                <select
+                                                    id="tb-extras"
+                                                    class="tb-input tb-listbox"
+                                                    data-role="bg"
+                                                    multiple
+                                                    size="4"
+                                                >
+                                                    <optgroup label="Support">
+                                                        <option>Email</option>
+                                                        <option selected>Chat</option>
+                                                    </optgroup>
+                                                    <optgroup label="Training">
+                                                        <option>Workshop</option>
+                                                        <option selected>Webinar</option>
+                                                    </optgroup>
+                                                </select>
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-range"
+                                                >Volume</label>
+                                                <div class="tb-inline">
+                                                    <input
+                                                        id="tb-range"
+                                                        data-role="primary"
+                                                        type="range"
+                                                        min="0"
+                                                        max="100"
+                                                        value="60"
+                                                    >
+                                                    <output
+                                                        class="tb-out"
+                                                        data-role="text"
+                                                        for="tb-range"
+                                                    >60</output>
+                                                </div>
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-meter"
+                                                >Storage used</label>
+                                                <meter
+                                                    id="tb-meter"
+                                                    data-role="accent"
+                                                    min="0"
+                                                    max="100"
+                                                    value="70"
+                                                >70%</meter>
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-prog"
+                                                >Upload</label>
+                                                <progress
+                                                    id="tb-prog"
+                                                    data-role="accent"
+                                                    max="100"
+                                                    value="45"
+                                                >45%</progress>
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <section class="tb-sec tb-two">
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Input types</p>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-pw"
+                                                >Password</label>
+                                                <input
+                                                    id="tb-pw"
+                                                    class="tb-input"
+                                                    data-role="bg"
+                                                    type="password"
+                                                    value="secret123"
+                                                    readonly
+                                                >
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-num"
+                                                >Quantity</label>
+                                                <input
+                                                    id="tb-num"
+                                                    class="tb-input"
+                                                    data-role="bg"
+                                                    type="number"
+                                                    value="3"
+                                                    readonly
+                                                >
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-date"
+                                                >Date</label>
+                                                <input
+                                                    id="tb-date"
+                                                    class="tb-input"
+                                                    data-role="bg"
+                                                    type="date"
+                                                    value="2026-10-22"
+                                                    readonly
+                                                >
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-file"
+                                                >Attachment</label>
+                                                <input
+                                                    id="tb-file"
+                                                    class="tb-input"
+                                                    data-role="bg"
+                                                    type="file"
+                                                >
+                                            </div>
+                                        </div>
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Input states</p>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-bad"
+                                                >Email address</label>
+                                                <input
+                                                    id="tb-bad"
+                                                    class="tb-input"
+                                                    data-role="bg"
+                                                    type="email"
+                                                    value="name@"
+                                                    aria-invalid="true"
+                                                    aria-describedby="tb-bad-msg"
+                                                    readonly
+                                                >
+                                                <p
+                                                    id="tb-bad-msg"
+                                                    class="tb-err"
+                                                    data-role="danger"
+                                                >Enter a valid email address.</p>
+                                            </div>
+                                            <div class="tb-field">
+                                                <label
+                                                    class="tb-label"
+                                                    data-role="text"
+                                                    for="tb-off"
+                                                >Disabled field</label>
+                                                <input
+                                                    id="tb-off"
+                                                    class="tb-input"
+                                                    data-role="disabled"
+                                                    value="Not editable"
+                                                    disabled
+                                                >
+                                            </div>
+                                            <div class="tb-choices">
+                                                <label class="tb-choice" data-role="disabled">
+                                                    <input type="checkbox" disabled>
+                                                    Disabled checkbox
+                                                </label>
+                                                <label class="tb-choice" data-role="disabled">
+                                                    <input type="radio" disabled>
+                                                    Disabled radio
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <section class="tb-sec tb-two">
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Status messages</p>
+                                            <p class="tb-msg tb-msg--danger" data-role="danger"><span class="tb-msg__i" aria-hidden="true">&#10005;</span>Payment failed. Check the card number.</p>
+                                            <p class="tb-msg tb-msg--success" data-role="success"><span class="tb-msg__i" aria-hidden="true">&#10003;</span>Your changes were saved.</p>
+                                            <p class="tb-msg tb-msg--warning" data-role="warning"><span class="tb-msg__i" aria-hidden="true">!</span>Your plan renews in 3 days.</p>
+                                        </div>
+                                        <div class="tb-card" data-role="surface">
+                                            <p class="tb-h3" data-role="text">Keyboard focus</p>
+                                            <div class="tb-row"><span class="tb-ringwrap" data-role="focus">
+                                                    <button class="tb-btn" type="button">Focused button</button>
+                                                </span><span class="tb-ringwrap" data-role="focus">
+                                                    <input
+                                                        class="tb-input"
+                                                        type="text"
+                                                        value="Focused field"
+                                                        aria-label="Focused field"
+                                                        readonly
+                                                    >
+                                                </span></div>
+                                        </div>
+                                    </section>
+                                </div>
+                                <hr class="tb-hr" data-role="border">
+                                <footer
+                                    class="tb-foot"
+                                    data-role="surface"
+                                    role="none"
+                                >
+                                    <address class="tb-addr tb-m" data-role="muted">Northwind Ltd<br>12 Example Street, Sampletown<br><a
+                                            class="tb-link"
+                                            data-role="primary"
+                                            href="#tb"
+                                        >hello@example.com</a></address>
+                                    <span data-role="muted">© 2026 Northwind. Lorem ipsum dolor sit amet.</span>
+                                    <ul class="tb-links">
+                                        <li><a
+                                                class="tb-link"
+                                                data-role="primary"
+                                                href="#tb"
+                                            >Privacy</a></li>
+                                        <li><a
+                                                class="tb-link"
+                                                data-role="primary"
+                                                href="#tb"
+                                            >Terms</a></li>
+                                    </ul>
+                                </footer>
+                            </div>
+                            <details>
+                                <summary>Elements in the preview</summary>
+                                <p class="hint">The preview uses real header, nav, search, section, article, aside, address, blockquote, figure, figcaption, details, summary, dialog, ul, ol, menu, li, dl, dt, dd, table, caption, colgroup, col, thead, tbody, tfoot, tr, th, td, fieldset, legend, label, input, textarea, select, optgroup, option, datalist, button, meter, progress, output, hr, img, canvas and footer elements, plus status messages, a focus ring, a visited link, inline text (strong, em, mark, code, kbd, samp, var, abbr, time, sub, sup, ins, del, s, q, small, pre), nested lists, breadcrumb and pagination navigation, and password, number, date and file inputs with invalid and disabled states. The preview frame stands in for body, and a plain div stands in for main, because this page already has its own main. A datalist has no box of its own and its suggestions are drawn by the browser, so the preview includes the input that uses it but cannot show or theme the list. The look of an open select and of the selected option in a list box is partly up to the browser. The picture and the chart are redrawn in your theme colours.</p>
+                            </details>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
 
-<dialog id="explorer" class="explorer" aria-labelledby="ex-title">
-  <div class="explorer__bar">
-    <div>
-      <h2 id="ex-title" tabindex="-1">Explore the colours</h2>
-      <p id="ex-count" class="hint">Kept 0, vetoed 0</p>
-    </div>
-    <button id="ex-close" type="button" class="secondary">Done</button>
-  </div>
-  <div id="ex-stage" class="explorer__stage" data-scroll="off">
-    <div id="ex-slot" class="explorer__slot"></div>
-    <details id="ex-preview" class="pv-box" hidden>
-      <summary id="pv-title">Preview on white</summary>
-      <p id="pv-hint" class="hint"></p>
-      <div id="pv" class="pv" role="img" data-bg="white">
-        <div class="pv__inner" inert>
-          <h1>Heading 1</h1>
-          <h2>Heading 2</h2>
-          <h3>Heading 3</h3>
-          <h4>Heading 4</h4>
-          <div class="pv__card">
-            <h3>Card title</h3>
-            <p>A card holds a short note. It uses the colour for its border and text. <a href="#pv">This is a link.</a></p>
-          </div>
-          <div class="pv__row">
-            <button type="button" class="pv__btn">Button</button>
-            <button type="button" class="pv__btn pv__btn--outline">Outline button</button>
-          </div>
-          <div class="pv__field">
-            <label for="pv-select">Dropdown</label>
-            <span class="pv__select">
-              <select id="pv-select">
-                <option>Option one</option>
-                <option>Option two</option>
-                <option>Option three</option>
-              </select>
-            </span>
-          </div>
-        </div>
-      </div>
-    </details>
-  </div>
-  <div class="explorer__foot">
-    <p id="ex-status" class="hint"></p>
-    <p id="ex-save-error" role="alert" hidden></p>
-    <div id="ex-actions" class="explorer__actions">
-      <button id="ex-veto" type="button" class="secondary" aria-keyshortcuts="ArrowLeft">Veto (left)</button>
-      <button id="ex-undo" type="button" class="secondary" disabled>Undo</button>
-      <button id="ex-keep" type="button" aria-keyshortcuts="ArrowRight">Keep (right)</button>
-    </div>
-    <div id="ex-view-actions" class="explorer__actions" hidden>
-      <button id="view-copy-hex" type="button" class="secondary">Copy hex</button>
-      <button id="view-copy-rgba" type="button" class="secondary">Copy RGBA</button>
-      <button id="view-remove" type="button" class="secondary">Remove</button>
-    </div>
-    <p id="ex-help" class="hint">Swipe or drag the card right to keep, left to veto. Or use the buttons or arrow keys.</p>
-    <p id="ex-live" class="visually-hidden" role="status"></p>
-  </div>
-</dialog>
+        <dialog
+            id="explorer"
+            class="explorer"
+            aria-labelledby="ex-title"
+        >
+            <div class="explorer__bar">
+                <div>
+                    <h2 id="ex-title" tabindex="-1">Explore the colours</h2>
+                    <p id="ex-count" class="hint">Kept 0, vetoed 0</p>
+                </div>
+                <button
+                    id="ex-close"
+                    type="button"
+                    class="secondary"
+                >Done</button>
+            </div>
+            <div
+                id="ex-stage"
+                class="explorer__stage"
+                data-scroll="off"
+            >
+                <div id="ex-slot" class="explorer__slot"></div>
+                <details
+                    id="ex-preview"
+                    class="pv-box"
+                    hidden
+                >
+                    <summary id="pv-title">Preview on white</summary>
+                    <p id="pv-hint" class="hint"></p>
+                    <div
+                        id="pv"
+                        class="pv"
+                        role="img"
+                        data-bg="white"
+                    >
+                        <div class="pv__inner" inert>
+                            <h1>Heading 1</h1>
+                            <h2>Heading 2</h2>
+                            <h3>Heading 3</h3>
+                            <h4>Heading 4</h4>
+                            <div class="pv__card">
+                                <h3>Card title</h3>
+                                <p>A card holds a short note. It uses the colour for its border and text. <a href="#pv">This is a link.</a></p>
+                            </div>
+                            <div class="pv__row">
+                                <button type="button" class="pv__btn">Button</button>
+                                <button type="button" class="pv__btn pv__btn--outline">Outline button</button>
+                            </div>
+                            <div class="pv__field">
+                                <label for="pv-select">Dropdown</label>
+                                <span class="pv__select">
+                                    <select id="pv-select">
+                                        <option>Option one</option>
+                                        <option>Option two</option>
+                                        <option>Option three</option>
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+            <div class="explorer__foot">
+                <p id="ex-status" class="hint"></p>
+                <p
+                    id="ex-save-error"
+                    role="alert"
+                    hidden
+                ></p>
+                <div id="ex-actions" class="explorer__actions">
+                    <button
+                        id="ex-veto"
+                        type="button"
+                        class="secondary"
+                        aria-keyshortcuts="ArrowLeft"
+                    >Veto (left)</button>
+                    <button
+                        id="ex-undo"
+                        type="button"
+                        class="secondary"
+                        disabled
+                    >Undo</button>
+                    <button
+                        id="ex-keep"
+                        type="button"
+                        aria-keyshortcuts="ArrowRight"
+                    >Keep (right)</button>
+                </div>
+                <div
+                    id="ex-view-actions"
+                    class="explorer__actions"
+                    hidden
+                >
+                    <button
+                        id="view-copy-hex"
+                        type="button"
+                        class="secondary"
+                    >Copy hex</button>
+                    <button
+                        id="view-copy-rgba"
+                        type="button"
+                        class="secondary"
+                    >Copy RGBA</button>
+                    <button
+                        id="view-remove"
+                        type="button"
+                        class="secondary"
+                    >Remove</button>
+                </div>
+                <p id="ex-help" class="hint">Swipe or drag the card right to keep, left to veto. Or use the buttons or arrow keys.</p>
+                <p
+                    id="ex-live"
+                    class="visually-hidden"
+                    role="status"
+                ></p>
+            </div>
+        </dialog>
 
-<dialog id="tb-pop" class="tbpop" aria-labelledby="tbpop-title">
-  <div class="tbpop__head">
-    <div>
-      <h2 id="tbpop-title" tabindex="-1">Choose a colour</h2>
-      <p id="tbpop-sub" class="hint"></p>
-    </div>
-    <button id="tbpop-close" type="button" class="secondary small">Close</button>
-  </div>
-  <div class="tbpop__tools">
-    <label for="tbpop-q" class="visually-hidden">Search your library, or type a colour name or hex code</label>
-    <input id="tbpop-q" class="tb-in" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="Search: light blue, ff8800" aria-describedby="tbpop-status">
-    <div id="tbpop-use" class="tbpop__use" hidden><span id="tbpop-use-dot" class="sw-dot" aria-hidden="true"></span><button id="tbpop-use-btn" type="button" class="secondary small"></button></div>
-    <div id="tbpop-alpha" class="tbpop__alpha">
-      <label for="tbpop-opacity"><span>Opacity</span> <output id="tbpop-opacity-out" for="tbpop-opacity">100%</output></label>
-      <input id="tbpop-opacity" type="range" min="0" max="100" step="1" value="100">
-    </div>
-    <label class="checkline" for="tbpop-pass"><input type="checkbox" id="tbpop-pass"> Only colours that pass contrast</label>
-    <p id="tbpop-status" class="hint" role="status"></p>
-  </div>
-  <ul id="tbpop-list" class="tiles tbpop__tiles" aria-label="Colours"></ul>
-</dialog>
+        <dialog
+            id="tb-pop"
+            class="tbpop"
+            aria-labelledby="tbpop-title"
+        >
+            <div class="tbpop__head">
+                <div>
+                    <h2 id="tbpop-title" tabindex="-1">Choose a colour</h2>
+                    <p id="tbpop-sub" class="hint"></p>
+                </div>
+                <button
+                    id="tbpop-close"
+                    type="button"
+                    class="secondary small"
+                >Close</button>
+            </div>
+            <div class="tbpop__tools">
+                <label for="tbpop-q" class="visually-hidden">Search your library, or type a colour name or hex code</label>
+                <input
+                    id="tbpop-q"
+                    class="tb-in"
+                    type="search"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    enterkeyhint="search"
+                    placeholder="Search: light blue, ff8800"
+                    aria-describedby="tbpop-status"
+                >
+                <div
+                    id="tbpop-use"
+                    class="tbpop__use"
+                    hidden
+                >
+                    <span
+                        id="tbpop-use-dot"
+                        class="sw-dot"
+                        aria-hidden="true"
+                    ></span>
+                    <button
+                        id="tbpop-use-btn"
+                        type="button"
+                        class="secondary small"
+                    ></button>
+                </div>
+                <div id="tbpop-alpha" class="tbpop__alpha">
+                    <label for="tbpop-opacity">
+                        <span>Opacity</span>
+                        <output id="tbpop-opacity-out" for="tbpop-opacity">100%</output>
+                    </label>
+                    <input
+                        id="tbpop-opacity"
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value="100"
+                    >
+                </div>
+                <label class="checkline" for="tbpop-pass">
+                    <input type="checkbox" id="tbpop-pass">
+                    Only colours that pass contrast
+                </label>
+                <p
+                    id="tbpop-status"
+                    class="hint"
+                    role="status"
+                ></p>
+            </div>
+            <ul
+                id="tbpop-list"
+                class="tiles tbpop__tiles"
+                aria-label="Colours"
+            ></ul>
+        </dialog>
 
-<footer class="site-footer">
-  <div class="wrap">
-    <p>Dathanna by <a href="https://nuadyr.github.io/">Nuadyr</a>. © 2026.</p>
-  </div>
-</footer>
+        <footer class="site-footer">
+            <div class="wrap">
+                <p>Dathanna by <a href="https://nuadyr.github.io/">Nuadyr</a>. © 2026.</p>
+            </div>
+        </footer>
 
-<script>
+        <script>
 'use strict';
 /* ---------- Helpers ---------- */
 const $ = (id) => document.getElementById(id);
@@ -1004,7 +1885,7 @@ const store = {
 /* Live regions: say(el, text) announces politely, fail(el, text) shows an alert, clear(el) hides both. */
 const say = (el, text) => { el.textContent = text; };
 const fail = (el, text) => { el.textContent = text; el.hidden = !text; };
-const clear = (...els) => els.forEach((el) => { el.textContent = ''; if (el.getAttribute('role') === 'alert') el.hidden = true; });
+const clear = (...els) => els.forEach((el) => { el.textContent = ''; if (el.getAttribute('role') === 'alert') {el.hidden = true;} });
 
 /* Copy with a fallback for browsers or pages without the async clipboard. */
 const copyText = async (text) => {
@@ -1029,7 +1910,7 @@ const focusHeading = (el) => { el.setAttribute('tabindex', '-1'); el.focus({ pre
   const metas = [...document.querySelectorAll('meta[name="theme-color"]')];
   const paper = { light: '#f3f5ef', dark: '#0e1511' };
   const apply = (mode) => {
-    if (mode === 'auto') delete root.dataset.theme; else root.dataset.theme = mode;
+    if (mode === 'auto') {delete root.dataset.theme;} else {root.dataset.theme = mode;}
     btn.textContent = 'Theme: ' + label[mode];
     // A manual choice pins the address bar colour; Auto restores the two media-specific values.
     metas.forEach((m) => {
@@ -1038,13 +1919,13 @@ const focusHeading = (el) => { el.setAttribute('tabindex', '-1'); el.focus({ pre
     });
   };
   let mode = order.includes(store.get('dathanna-theme-mode')) ? store.get('dathanna-theme-mode') : 'auto';
-  try { const legacy = localStorage.getItem('dathanna-theme'); if (legacy === 'light' || legacy === 'dark') mode = mode === 'auto' ? legacy : mode; } catch { /* ignore */ }
+  try { const legacy = localStorage.getItem('dathanna-theme'); if (legacy === 'light' || legacy === 'dark') {mode = mode === 'auto' ? legacy : mode;} } catch { /* ignore */ }
   apply(mode);
   btn.addEventListener('click', () => {
     mode = order[(order.indexOf(mode) + 1) % order.length];
     apply(mode);
     store.set('dathanna-theme-mode', mode);
-    try { if (mode === 'auto') localStorage.removeItem('dathanna-theme'); else localStorage.setItem('dathanna-theme', mode); } catch { /* ignore */ }
+    try { if (mode === 'auto') {localStorage.removeItem('dathanna-theme');} else {localStorage.setItem('dathanna-theme', mode);} } catch { /* ignore */ }
   });
 })();
 
@@ -1052,7 +1933,7 @@ const focusHeading = (el) => { el.setAttribute('tabindex', '-1'); el.focus({ pre
 (function motion() {
   const btn = $('motion-toggle');
   const set = (paused) => {
-    if (paused) document.documentElement.dataset.motion = 'paused'; else delete document.documentElement.dataset.motion;
+    if (paused) {document.documentElement.dataset.motion = 'paused';} else {delete document.documentElement.dataset.motion;}
     btn.setAttribute('aria-pressed', String(paused));
     btn.textContent = paused ? 'Resume motion' : 'Pause motion';
   };
@@ -1292,31 +2173,31 @@ yellow green 9acd32`;
   let cacheVersion = 0, pausedUntil = 0, lastNetOk = null;
   (function loadNameCache() {
     const raw = store.get('dathanna-name-cache', {});
-    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return;
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {return;}
     Object.keys(raw).forEach((k) => {
       const v = raw[k];
-      if (/^[0-9a-f]{6}$/.test(k) && v && typeof v.n === 'string' && v.n && typeof v.d === 'number') nameCache.set(k, { n: v.n.slice(0, NAME_MAX_LEN), d: v.d });
+      if (/^[0-9a-f]{6}$/.test(k) && v && typeof v.n === 'string' && v.n && typeof v.d === 'number') {nameCache.set(k, { n: v.n.slice(0, NAME_MAX_LEN), d: v.d });}
     });
   })();
   function saveNameCache() {
-    if (nameCache.size > NAME_CACHE_MAX) [...nameCache.keys()].slice(0, nameCache.size - NAME_CACHE_MAX + NAME_CACHE_TRIM).forEach((k) => nameCache.delete(k));
+    if (nameCache.size > NAME_CACHE_MAX) {[...nameCache.keys()].slice(0, nameCache.size - NAME_CACHE_MAX + NAME_CACHE_TRIM).forEach((k) => nameCache.delete(k));}
     store.set('dathanna-name-cache', Object.fromEntries(nameCache));
   }
   /* The name describes the colour as it appears on its backdrop (the "Looks like" value), not the raw RGB. */
   const keyOf = (it) => seenOn(it, BACKDROPS[it.bg].rgb).map(hex2).join('').toLowerCase();
   function nameFor(seen) {
     const hit = nameCache.get(seen.map(hex2).join('').toLowerCase());
-    if (hit) return { name: hit.n, exact: hit.d < EXACT_DELTA_API, src: 'api' };
+    if (hit) {return { name: hit.n, exact: hit.d < EXACT_DELTA_API, src: 'api' };}
     const local = nearestName(seen);
     return { name: local.name, exact: local.exact, src: 'local' };
   }
   function nameHint(d) {
-    if (d.src === 'api') return d.exact ? 'Practically identical to this named colour' : 'Closest named colour';
+    if (d.src === 'api') {return d.exact ? 'Practically identical to this named colour' : 'Closest named colour';}
     return d.exact ? 'Matches this CSS colour name' : 'Closest CSS colour name (built-in list)';
   }
   const slugify = (s) => s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'colour';
   function setNameStatus(ok) {
-    if (ok === lastNetOk) return;
+    if (ok === lastNetOk) {return;}
     lastNetOk = ok;
     say($('names-status'), ok ? '' : 'Online colour names are unavailable right now, so Dathanna is using its built-in CSS names. It will try again shortly.');
   }
@@ -1326,19 +2207,19 @@ yellow green 9acd32`;
     const timer = setTimeout(() => ctrl.abort(), NAME_TIMEOUT);
     try {
       const res = await fetch(NAME_API + '?list=' + NAME_LIST + '&values=' + chunk.join(','), { signal: ctrl.signal, headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (!res.ok) {throw new Error('HTTP ' + res.status);}
       const data = await res.json();
       const rows = data && Array.isArray(data.colors) ? data.colors : [];
       let got = 0;
       rows.forEach((row, i) => {
-        if (!row || typeof row.name !== 'string' || !row.name.trim()) return;
+        if (!row || typeof row.name !== 'string' || !row.name.trim()) {return;}
         const key = (typeof row.requestedHex === 'string' ? row.requestedHex.replace('#', '') : (chunk[i] || '')).toLowerCase();
-        if (!chunk.includes(key)) return;
+        if (!chunk.includes(key)) {return;}
         const dist = Number(row.distance);
         nameCache.set(key, { n: row.name.trim().slice(0, NAME_MAX_LEN), d: Number.isFinite(dist) ? dist : NAME_DIST_UNKNOWN });
         got += 1;
       });
-      if (!got) throw new Error('No names returned');
+      if (!got) {throw new Error('No names returned');}
       cacheVersion += 1; saveNameCache(); setNameStatus(true);
     } catch {
       pausedUntil = Date.now() + NAME_PAUSE; setNameStatus(false);
@@ -1346,13 +2227,13 @@ yellow green 9acd32`;
   }
   /* Resolves once every key has been tried. Never rejects. Keys already cached, or in flight, cost nothing. */
   function fetchNames(keys) {
-    if (!state.settings.online) return Promise.resolve();
+    if (!state.settings.online) {return Promise.resolve();}
     const need = [...new Set(keys)].filter((k) => !nameCache.has(k));
-    if (!need.length) return Promise.resolve();
+    if (!need.length) {return Promise.resolve();}
     if (navigator.onLine === false) { setNameStatus(false); return Promise.resolve(); }
-    if (Date.now() < pausedUntil) return Promise.resolve();
+    if (Date.now() < pausedUntil) {return Promise.resolve();}
     const waits = [], fresh = [];
-    need.forEach((k) => { if (inflight.has(k)) waits.push(inflight.get(k)); else fresh.push(k); });
+    need.forEach((k) => { if (inflight.has(k)) {waits.push(inflight.get(k));} else {fresh.push(k);} });
     for (let i = 0; i < fresh.length; i += NAME_BATCH) {
       const chunk = fresh.slice(i, i + NAME_BATCH);
       const p = requestNames(chunk).finally(() => chunk.forEach((k) => inflight.delete(k)));
@@ -1395,7 +2276,7 @@ yellow green 9acd32`;
   state.library = loadList('dathanna-library');
   state.blacklist = loadList('dathanna-blacklist');
   const savedSettings = store.get('dathanna-settings', {});
-  if (savedSettings && Object.prototype.hasOwnProperty.call(BACKDROPS, savedSettings.bg)) state.settings.bg = savedSettings.bg;
+  if (savedSettings && Object.prototype.hasOwnProperty.call(BACKDROPS, savedSettings.bg)) {state.settings.bg = savedSettings.bg;}
   state.settings.safe = Boolean(savedSettings && savedSettings.safe);
   state.settings.online = Boolean(savedSettings && savedSettings.online === true);
   /* Saving can fail when storage is full or blocked. Say so, because the colours would otherwise be lost silently. */
@@ -1425,8 +2306,8 @@ yellow green 9acd32`;
       const pick = () => (safe ? SAFE_STEP * rnd(SAFE_LEVELS) : rnd(CHANNEL_MAX + 1));
       const it = { r: pick(), g: pick(), b: pick(), a: 1, bg };
       const seen = seenOn(it, bgRgb);
-      if (contrast(lum(seen), bgLum) < AA) continue;
-      if (tooClose(it)) continue;
+      if (contrast(lum(seen), bgLum) < AA) {continue;}
+      if (tooClose(it)) {continue;}
       it.id = makeId(it);
       return it;
     }
@@ -1436,29 +2317,29 @@ yellow green 9acd32`;
   /* Upcoming colours are generated a few at a time so their names can be fetched in one request. */
   const QUEUE_MIN = 3, QUEUE_MAX = 6;
   function fillQueue() {
-    if (state.queue.length >= QUEUE_MIN) return;
+    if (state.queue.length >= QUEUE_MIN) {return;}
     const fresh = [];
     while (state.queue.length < QUEUE_MAX) {
       const it = nextColour();
-      if (!it) break;
+      if (!it) {break;}
       state.queue.push(it); fresh.push(it);
     }
-    if (fresh.length) fetchNames(fresh.map(keyOf));
+    if (fresh.length) {fetchNames(fresh.map(keyOf));}
   }
   /* Next colour to show, with its name resolved (or the built-in name if the API is slow or down). */
   async function takeNext() {
     let it = null;
     for (let pass = 0; pass < 2 && !it; pass++) {
       fillQueue();
-      while (state.queue.length && !it) { const c = state.queue.shift(); if (!tooClose(c)) it = c; }
+      while (state.queue.length && !it) { const c = state.queue.shift(); if (!tooClose(c)) {it = c;} }
     }
-    if (it) await Promise.race([fetchNames([keyOf(it)]), timeout(NAME_WAIT)]);
+    if (it) {await Promise.race([fetchNames([keyOf(it)]), timeout(NAME_WAIT)]);}
     fillQueue();
     return it;
   }
 
   /* ----- DOM helpers ----- */
-  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) {n.className = cls;} if (text !== undefined) {n.textContent = text;} return n; };
   const motionOff = () => document.documentElement.dataset.motion === 'paused' || matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function swatchEl(d) {
@@ -1490,7 +2371,7 @@ yellow green 9acd32`;
   function badgesEl(d) {
     const wrap = el('div', 'ccard__badges');
     wrap.append(el('span', 'badge ' + (d.aa ? 'badge--ok' : 'badge--problem'), d.ratioText + ':1 ' + (d.aa ? 'AA pass' : 'AA fail')));
-    if (d.aaa) wrap.append(el('span', 'badge badge--info', 'AAA too'));
+    if (d.aaa) {wrap.append(el('span', 'badge badge--info', 'AAA too'));}
     return wrap;
   }
 
@@ -1526,11 +2407,11 @@ yellow green 9acd32`;
 
   const normText = (t) => t.toLowerCase().replace(/grey/g, 'gray').replace(/[^a-z0-9]+/g, ' ').trim();
   function editDistance(a, b) {
-    if (a === b) return 0;
+    if (a === b) {return 0;}
     let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
     for (let i = 1; i <= a.length; i++) {
       const cur = [i];
-      for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      for (let j = 1; j <= b.length; j++) {cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));}
       prev = cur;
     }
     return prev[b.length];
@@ -1542,15 +2423,15 @@ yellow green 9acd32`;
   }).join(' ');
   /* 0 means the same name, 0.02 the same sound. Typos score by edit distance, and a start-of-name or whole-word match scores well so "blu" finds Blue. */
   function nameScore(q, c) {
-    if (q.replace(/ /g, '') === c.replace(/ /g, '')) return 0;
+    if (q.replace(/ /g, '') === c.replace(/ /g, '')) {return 0;}
     const pq = phon(q), pc = phon(c);
     const qc = pq.replace(/ /g, ''), cc = pc.replace(/ /g, '');
-    if (qc === cc) return MATCH.sound;
+    if (qc === cc) {return MATCH.sound;}
     let best = editDistance(qc, cc) / Math.max(qc.length, cc.length);
     const gap = Math.max(0, 1 - qc.length / cc.length);
-    if (qc.length >= MATCH.prefixMinLen && cc.startsWith(qc)) best = Math.min(best, MATCH.prefix + MATCH.gapWeight * gap);
+    if (qc.length >= MATCH.prefixMinLen && cc.startsWith(qc)) {best = Math.min(best, MATCH.prefix + MATCH.gapWeight * gap);}
     const ct = pc.split(' ');
-    if (qc.length >= MATCH.wordMinLen && pq.split(' ').every((t) => ct.some((u) => u.startsWith(t)))) best = Math.min(best, MATCH.word + MATCH.gapWeight * gap);
+    if (qc.length >= MATCH.wordMinLen && pq.split(' ').every((t) => ct.some((u) => u.startsWith(t)))) {best = Math.min(best, MATCH.word + MATCH.gapWeight * gap);}
     return best;
   }
   /* Built-in CSS names only, so the online-names setting never changes what a search matches. */
@@ -1558,7 +2439,7 @@ yellow green 9acd32`;
   function bestName(q) {
     let best = null, bestScore = Infinity;
     for (const c of NAME_CANDIDATES) {
-      if (!c.norm) continue;
+      if (!c.norm) {continue;}
       const sc = nameScore(q, c.norm);
       if (sc < bestScore) { bestScore = sc; best = c; }
     }
@@ -1567,22 +2448,22 @@ yellow green 9acd32`;
   /* Returns { rgb, via, label? } for a usable search, or { error } when the text is not understood. */
   function parseTarget(text) {
     const raw = text.trim();
-    if (!raw) return null;
+    if (!raw) {return null;}
     const q = normText(raw);
     const triple = raw.match(/^(?:rgba?\s*\()?\s*(\d{1,3})\s*[,\s]\s*(\d{1,3})\s*[,\s]\s*(\d{1,3})\b/i);
     if (triple) {
       const rgb = triple.slice(1, 1 + RGB_CHANNELS).map((n) => Number(n));
-      if (rgb.every((n) => n <= CHANNEL_MAX)) return { rgb, via: 'rgb' };
+      if (rgb.every((n) => n <= CHANNEL_MAX)) {return { rgb, via: 'rgb' };}
     }
     const name = q ? bestName(q) : null;
-    if (name && name.score === 0) return { rgb: name.rgb, via: 'name', label: name.label, exact: true };
+    if (name && name.score === 0) {return { rgb: name.rgb, via: 'name', label: name.label, exact: true };}
     const h = raw.replace(/^#/, '');
     const isHex = /^[0-9a-f]+$/i.test(h);
     if (isHex && HEX_LENGTHS.includes(h.length)) {
       const full = h.length <= HEX_SHORT_ALPHA ? h.slice(0, HEX_SHORT).replace(/./g, (c) => c + c) : h.slice(0, HEX_LONG);   // 3 and 4 digit forms double each digit; the alpha digits are ignored
       return { rgb: hexChannels(full, 0), via: 'hex' };
     }
-    if (name && name.score <= SEARCH_FUZZY_MAX) return { rgb: name.rgb, via: 'name', label: name.label, exact: false };
+    if (name && name.score <= SEARCH_FUZZY_MAX) {return { rgb: name.rgb, via: 'name', label: name.label, exact: false };}
     return { error: isHex && h.length <= HEX_LONG_ALPHA ? 'hex' : 'none' };
   }
   /* Every kept colour is checked on each backdrop, wherever it was kept, so the Explore settings never change what a search finds.
@@ -1591,7 +2472,7 @@ yellow green 9acd32`;
     const bgRgb = BACKDROPS[bg].rgb, byColour = new Map();
     state.library.forEach((it) => {
       const k = it.r + '-' + it.g + '-' + it.b + '-' + it.a, have = byColour.get(k);
-      if (!have || (it.bg === bg && have.bg !== bg)) byColour.set(k, it);
+      if (!have || (it.bg === bg && have.bg !== bg)) {byColour.set(k, it);}
     });
     return [...byColour.values()]
       .map((it) => ({ it, d: deltaE(searchTarget.lab, toLab(seenOn(it, bgRgb))) }))
@@ -1610,7 +2491,7 @@ yellow green 9acd32`;
       dot.setAttribute('aria-hidden', 'true');
       kids.push(dot);
     }
-    if (text) kids.push(el('span', '', text));
+    if (text) {kids.push(el('span', '', text));}
     qStatus.replaceChildren(...kids);
   }
   function resetSearch() {
@@ -1633,15 +2514,15 @@ yellow green 9acd32`;
     }
     const hex = '#' + res.rgb.map(hex2).join('').toUpperCase();
     let lead;
-    if (res.via !== 'name') lead = 'Nearest to ' + hex + '.';
-    else if (res.exact) lead = 'Nearest to ' + res.label + ' (' + hex + ').';
-    else lead = 'Matched \u201c' + text.trim() + '\u201d to ' + res.label + ' (' + hex + ').';
+    if (res.via !== 'name') {lead = 'Nearest to ' + hex + '.';}
+    else if (res.exact) {lead = 'Nearest to ' + res.label + ' (' + hex + ').';}
+    else {lead = 'Matched \u201c' + text.trim() + '\u201d to ' + res.label + ' (' + hex + ').';}
     const [w, b] = BGS.map((bg) => $('lib-' + bg).children.length);
     setSearchStatus(lead + ' On white: ' + w + ' shown. On black: ' + b + ' shown.', res.rgb);
   }
   qInput.addEventListener('input', () => {
     clearTimeout(searchTimer);
-    if (!qInput.value.trim()) applySearch(); else searchTimer = setTimeout(applySearch, SEARCH_DEBOUNCE);
+    if (!qInput.value.trim()) {applySearch();} else {searchTimer = setTimeout(applySearch, SEARCH_DEBOUNCE);}
   });
   qInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); applySearch(); }
@@ -1685,7 +2566,7 @@ yellow green 9acd32`;
   /* Name any kept or vetoed colours that do not have an online name yet, then redraw once if some arrived. */
   function refreshNames() {
     const v = cacheVersion;
-    fetchNames([...state.library, ...state.blacklist].map(keyOf)).then(() => { if (cacheVersion !== v) renderMain(); });
+    fetchNames([...state.library, ...state.blacklist].map(keyOf)).then(() => { if (cacheVersion !== v) {renderMain();} });
   }
 
   function removeFromLibrary(id) {
@@ -1696,8 +2577,8 @@ yellow green 9acd32`;
 
   /* Selecting a tile opens the explorer dialog showing that colour. */
   const onTile = (e) => {
-    const b = e.target.closest('button[data-id]'); if (!b) return;
-    const it = state.library.find((x) => x.id === b.dataset.id); if (!it) return;
+    const b = e.target.closest('button[data-id]'); if (!b) {return;}
+    const it = state.library.find((x) => x.id === b.dataset.id); if (!it) {return;}
     openViewer(it, b.dataset.focusKey);
   };
   ['recent-white', 'recent-black', 'lib-white', 'lib-black'].forEach((id) => $(id).addEventListener('click', onTile));
@@ -1709,7 +2590,7 @@ yellow green 9acd32`;
     const lines = [];
     BGS.forEach((bg) => {
       const items = state.library.filter((x) => x.bg === bg);
-      if (!items.length) return;
+      if (!items.length) {return;}
       lines.push('  /* On ' + bg + ' */');
       items.forEach((it) => {
         const d = describe(it);
@@ -1719,20 +2600,20 @@ yellow green 9acd32`;
       });
     });
     const css = ':root {\n' + lines.join('\n') + '\n}';
-    if (await copyText(css)) say(libStatus, 'Copied ' + state.library.length + ' colours as CSS variables.'); else fail(libError, 'Copying failed.');
+    if (await copyText(css)) {say(libStatus, 'Copied ' + state.library.length + ' colours as CSS variables.');} else {fail(libError, 'Copying failed.');}
   });
   $('lib-clear').addEventListener('click', () => {
-    if (!confirm('Remove all ' + state.library.length + ' colours from your library?')) return;
+    if (!confirm('Remove all ' + state.library.length + ' colours from your library?')) {return;}
     state.library = []; state.history = []; saveLists(); resetSearch(); renderMain(); say(libStatus, 'Library cleared.');
   });
   $('veto-list').addEventListener('click', (e) => {
-    const b = e.target.closest('button[data-action="restore"]'); if (!b) return;
+    const b = e.target.closest('button[data-action="restore"]'); if (!b) {return;}
     state.blacklist = state.blacklist.filter((x) => x.id !== b.dataset.id);
     state.history = state.history.filter((h) => h.item.id !== b.dataset.id);
     saveLists(); renderMain(); say($('veto-status'), 'Colour restored. It can appear again on that backdrop.');
   });
   $('veto-clear').addEventListener('click', () => {
-    if (!confirm('Clear all ' + state.blacklist.length + ' vetoes? Those colours can appear again.')) return;
+    if (!confirm('Clear all ' + state.blacklist.length + ' vetoes? Those colours can appear again.')) {return;}
     state.blacklist = []; saveLists(); renderMain(); say($('veto-status'), 'All vetoes cleared.');
   });
 
@@ -1765,15 +2646,15 @@ yellow green 9acd32`;
   const roleName = (r) => TB_ROLES.find((x) => x[0] === r)[1];
   const theme = Object.assign({}, TB_LIGHT);
   const savedTheme = store.get('dathanna-theme', {});
-  if (savedTheme && typeof savedTheme === 'object') { if (HEX_ANY.test(savedTheme.bg) && lum(hexRgb(savedTheme.bg)) <= DARK_LUM_MAX) Object.assign(theme, TB_DARK); } /* roles added since the theme was saved start from the matching preset */
-  if (savedTheme && typeof savedTheme === 'object') TB_ROLES.forEach(([r]) => { if (HEX_ANY.test(savedTheme[r])) theme[r] = savedTheme[r].toUpperCase(); });
+  if (savedTheme && typeof savedTheme === 'object') { if (HEX_ANY.test(savedTheme.bg) && lum(hexRgb(savedTheme.bg)) <= DARK_LUM_MAX) {Object.assign(theme, TB_DARK);} } /* roles added since the theme was saved start from the matching preset */
+  if (savedTheme && typeof savedTheme === 'object') {TB_ROLES.forEach(([r]) => { if (HEX_ANY.test(savedTheme[r])) {theme[r] = savedTheme[r].toUpperCase();} });}
   theme.bg = hex6(theme.bg);
   let tbSel = 'primary';
   const tbEl = $('tb'), tbStatus = $('tb-status'), tbImg = $('tb-img'), tbCanvas = $('tb-canvas');
   const LIGHT_MIN = 0.179;   // luminance at which a backdrop has equal contrast with white and with black
   /* The preset decides which library section feeds the colour picker: Light uses colours kept on white, Dark uses colours kept on black. */
   let tbMode = store.get('dathanna-theme-mode', null);
-  if (tbMode !== 'white' && tbMode !== 'black') tbMode = lum(hexRgb(theme.bg)) > LIGHT_MIN ? 'white' : 'black';
+  if (tbMode !== 'white' && tbMode !== 'black') {tbMode = lum(hexRgb(theme.bg)) > LIGHT_MIN ? 'white' : 'black';}
   /* The preview holds real controls so the theme is judged on real elements. Inert takes them out of the tab order and the accessibility tree, so the frame stays one labelled image; taps still reach the frame. */
   [...tbEl.children].forEach((n) => { n.inert = true; });
   /* The picture and the chart are drawn from the theme, so they follow every change. */
@@ -1782,7 +2663,7 @@ yellow green 9acd32`;
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><rect width="320" height="180" fill="' + c.surface + '"/><circle cx="240" cy="60" r="28" fill="' + c.accent + '"/><path d="M0 150 90 70l60 55 50-35 120 70v20H0z" fill="' + c.primary + '"/></svg>';
     tbImg.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
     const ctx = tbCanvas.getContext && tbCanvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {return;}
     const w = tbCanvas.width, h = tbCanvas.height, pad = 40, base = h - pad, top = 24;
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = c.surface; ctx.fillRect(0, 0, w, h);
@@ -1819,7 +2700,7 @@ yellow green 9acd32`;
     let passed = 0;
     $('tb-checks').replaceChildren(...TB_CHECKS.map(([a, b, label, min]) => {
       const ratio = checkRatio(theme, a, b), ok = ratio >= min, [fg, back] = seenPair(theme, a, b);
-      if (ok) passed += 1;
+      if (ok) {passed += 1;}
       const li = el('li'), smp = el('span', 'tb-sample', 'Aa');
       smp.style.color = rgbCss(fg); smp.style.background = rgbCss(back); smp.setAttribute('aria-hidden', 'true');
       li.append(smp, el('span', 'hint', label + ': ' + (Math.floor(ratio * PCT) / PCT).toFixed(2) + ':1'), el('span', 'badge ' + (ok ? 'badge--ok' : 'badge--problem'), (ok ? 'Pass ' : 'Fail ') + min + ':1'));
@@ -1836,7 +2717,7 @@ yellow green 9acd32`;
     say(tbStatus, roleName(r) + ' is now ' + nearestName(hexRgb(hex)).name + ' ' + theme[r] + '.');
   }
   function setOpacity(r, pct) {
-    if (r === 'bg') return;
+    if (r === 'bg') {return;}
     theme[r] = withAlpha(theme[r], pct / PCT); renderTheme();
   }
 
@@ -1875,7 +2756,7 @@ yellow green 9acd32`;
         .map((m) => m.x);
     }
     const total = items.length;
-    if (popPass.checked) items = items.filter((x) => rolePasses(role, x.hex));
+    if (popPass.checked) {items = items.filter((x) => rolePasses(role, x.hex));}
     popList.replaceChildren(...items.map((x) => {
       const li = el('li'), b = el('button', 'tile'); b.type = 'button'; b.dataset.hex = x.hex;
       b.style.setProperty('--tile', x.hex);
@@ -1891,16 +2772,16 @@ yellow green 9acd32`;
     const hidden = total - items.length;
     let text;
     if (!items.length) {
-      if (q && !popTyped && !total) text = 'No library colour matched that. Try a name such as light blue, or a hex code such as ff8800.';
-      else if (popPass.checked) text = 'No colours pass contrast for this variable. Turn the filter off to see them all.';
-      else text = 'No colours to show.';
+      if (q && !popTyped && !total) {text = 'No library colour matched that. Try a name such as light blue, or a hex code such as ff8800.';}
+      else if (popPass.checked) {text = 'No colours pass contrast for this variable. Turn the filter off to see them all.';}
+      else {text = 'No colours to show.';}
     }
-    else text = items.length + (items.length === 1 ? ' colour' : ' colours') + (q ? ', nearest first' : '') + (hidden ? ', ' + hidden + ' hidden by the contrast filter' : '') + '.';
-    if (!q && !state.library.some((it) => it.bg === tbMode)) text += ' Nothing is kept on ' + tbMode + ' in your library yet.';
+    else {text = items.length + (items.length === 1 ? ' colour' : ' colours') + (q ? ', nearest first' : '') + (hidden ? ', ' + hidden + ' hidden by the contrast filter' : '') + '.';}
+    if (!q && !state.library.some((it) => it.bg === tbMode)) {text += ' Nothing is kept on ' + tbMode + ' in your library yet.';}
     say($('tbpop-status'), text);
   }
   function openPicker(role, fromPreview) {
-    if (pop.open || dlg.open) return;
+    if (pop.open || dlg.open) {return;}
     tbSel = role; popViaPreview = Boolean(fromPreview); renderTheme();
     $('tbpop-title').textContent = roleName(role);
     $('tbpop-sub').textContent = pickerSub(role);
@@ -1914,7 +2795,7 @@ yellow green 9acd32`;
     $('tbpop-title').focus();
   }
   const useFromPicker = (hex) => { assign(tbSel, hex); pop.close(); };
-  $('tb-roles').addEventListener('click', (e) => { const b = e.target.closest('button[data-role]'); if (b) openPicker(b.dataset.role, false); });
+  $('tb-roles').addEventListener('click', (e) => { const b = e.target.closest('button[data-role]'); if (b) {openPicker(b.dataset.role, false);} });
   /* Controls inside the preview ignore the pointer, so a click is matched to the smallest themed box under it. */
   /* A tap resolves to the smallest themed box under it, then is refined: text drawn on a solid fill (data-text-role) opens the text-on-fill role,
      and a tap within a few pixels of a visible border opens the border role that edge is actually painted with. */
@@ -1923,9 +2804,9 @@ yellow green 9acd32`;
   function onText(n, x, y) {
     const w = document.createTreeWalker(n, NodeFilter.SHOW_TEXT), rg = document.createRange();
     for (let t = w.nextNode(); t; t = w.nextNode()) {
-      if (!t.textContent.trim()) continue;
+      if (!t.textContent.trim()) {continue;}
       rg.selectNodeContents(t);
-      for (const r of rg.getClientRects()) if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return true;
+      for (const r of rg.getClientRects()) {if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {return true;}}
     }
     return false;
   }
@@ -1946,7 +2827,7 @@ yellow green 9acd32`;
     let hit = null, area = Infinity;
     tbEl.querySelectorAll('*').forEach((n) => {
       const r = n.getBoundingClientRect();
-      if (!r.width || !r.height || x < r.left || x > r.right || y < r.top || y > r.bottom || r.width * r.height > area) return;
+      if (!r.width || !r.height || x < r.left || x > r.right || y < r.top || y > r.bottom || r.width * r.height > area) {return;}
       const role = edgeRole(n, x, y);
       if (role) { hit = role; area = r.width * r.height; }
     });
@@ -1956,34 +2837,34 @@ yellow green 9acd32`;
     let best = tbEl, area = Infinity;
     tbEl.querySelectorAll('[data-role]').forEach((n) => {
       const r = hitRect(n);
-      if (!r.raw.width && !r.raw.height || x < r.left || x > r.right || y < r.top || y > r.bottom) return;
+      if (!r.raw.width && !r.raw.height || x < r.left || x > r.right || y < r.top || y > r.bottom) {return;}
       if (r.width * r.height <= area) { area = r.width * r.height; best = n; }
     });
-    if (best.dataset.textRole && onText(best, x, y)) return best.dataset.textRole;
+    if (best.dataset.textRole && onText(best, x, y)) {return best.dataset.textRole;}
     return edgeAt(x, y) || best.dataset.role;
   }
   tbEl.addEventListener('click', (e) => { e.preventDefault(); openPicker(roleAt(e.clientX, e.clientY), true); });
-  popList.addEventListener('click', (e) => { const b = e.target.closest('button[data-hex]'); if (b) useFromPicker(b.dataset.hex); });
-  popUseBtn.addEventListener('click', () => { if (popUseBtn.dataset.hex) useFromPicker(popUseBtn.dataset.hex); });
+  popList.addEventListener('click', (e) => { const b = e.target.closest('button[data-hex]'); if (b) {useFromPicker(b.dataset.hex);} });
+  popUseBtn.addEventListener('click', () => { if (popUseBtn.dataset.hex) {useFromPicker(popUseBtn.dataset.hex);} });
   popQ.addEventListener('input', renderPicker);
   popQ.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); if (popTyped) useFromPicker(popTyped); }
+    if (e.key === 'Enter') { e.preventDefault(); if (popTyped) {useFromPicker(popTyped);} }
     else if (e.key === 'Escape' && popQ.value) { e.preventDefault(); popQ.value = ''; renderPicker(); }
   });
   popPass.addEventListener('change', renderPicker);
   /* The slider updates the preview as it moves. The contrast filter, if on, is refreshed once the slider is released. */
   popOpacity.addEventListener('input', () => { setOpacity(tbSel, Number(popOpacity.value)); syncOpacity(); $('tbpop-sub').textContent = pickerSub(tbSel); });
-  popOpacity.addEventListener('change', () => { if (popPass.checked) renderPicker(); });
+  popOpacity.addEventListener('change', () => { if (popPass.checked) {renderPicker();} });
   $('tbpop-close').addEventListener('click', () => pop.close());
   /* A click on the dimmed backdrop lands on the dialog element itself, outside its box. */
   pop.addEventListener('click', (e) => {
-    if (e.target !== pop) return;
+    if (e.target !== pop) {return;}
     const r = pop.getBoundingClientRect();
-    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) pop.close();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {pop.close();}
   });
   pop.addEventListener('close', () => {
     document.documentElement.classList.remove('is-modal');
-    if (popViaPreview) { const b = $('tb-roles').querySelector('[data-role="' + tbSel + '"]'); if (b) b.focus({ preventScroll: true }); }
+    if (popViaPreview) { const b = $('tb-roles').querySelector('[data-role="' + tbSel + '"]'); if (b) {b.focus({ preventScroll: true });} }
   });
   $('tb-light').addEventListener('click', () => { Object.assign(theme, TB_LIGHT); tbMode = 'white'; renderTheme(); say(tbStatus, 'Light preset applied. The picker now shows colours kept on white.'); });
   $('tb-dark').addEventListener('click', () => { Object.assign(theme, TB_DARK); tbMode = 'black'; renderTheme(); say(tbStatus, 'Dark preset applied. The picker now shows colours kept on black.'); });
@@ -2003,18 +2884,18 @@ yellow green 9acd32`;
       $('tab-' + t).setAttribute('tabindex', on ? '0' : '-1');
       $('panel-' + t).hidden = !on;
     });
-    if (focusTab) $('tab-' + name).focus();
+    if (focusTab) {$('tab-' + name).focus();}
   }
   TABS.forEach((t, i) => {
     $('tab-' + t).addEventListener('click', () => selectTab(t));
     $('tab-' + t).addEventListener('keydown', (e) => {
       const k = e.key;
       let j = null;
-      if (k === 'ArrowRight') j = (i + 1) % TABS.length;
-      else if (k === 'ArrowLeft') j = (i - 1 + TABS.length) % TABS.length;
-      else if (k === 'Home') j = 0;
-      else if (k === 'End') j = TABS.length - 1;
-      if (j === null) return;
+      if (k === 'ArrowRight') {j = (i + 1) % TABS.length;}
+      else if (k === 'ArrowLeft') {j = (i - 1 + TABS.length) % TABS.length;}
+      else if (k === 'Home') {j = 0;}
+      else if (k === 'End') {j = TABS.length - 1;}
+      if (j === null) {return;}
       e.preventDefault(); selectTab(TABS[j], true);
     });
   });
@@ -2048,7 +2929,7 @@ yellow green 9acd32`;
     const stranded = !state.current && (document.activeElement === keepBtn || document.activeElement === vetoBtn);
     keepBtn.disabled = vetoBtn.disabled = !state.current;
     undoBtn.disabled = state.history.length === 0;
-    if (stranded) (undoBtn.disabled ? $('ex-title') : undoBtn).focus();
+    if (stranded) {(undoBtn.disabled ? $('ex-title') : undoBtn).focus();}
   }
 
   /* ----- Preview accordion ----- */
@@ -2058,14 +2939,14 @@ yellow green 9acd32`;
     const open = !pvBox.hidden && pvBox.open;
     const fits = stage.scrollHeight <= stage.clientHeight + FIT_TOLERANCE_PX;
     const next = open || !fits ? 'on' : 'off';
-    if (stage.dataset.scroll === next) return;
+    if (stage.dataset.scroll === next) {return;}
     stage.dataset.scroll = next;
-    if (next === 'off') stage.scrollTop = 0;
+    if (next === 'off') {stage.scrollTop = 0;}
   }
   /* Show a colour as headings, a card, buttons and a dropdown on the backdrop it belongs to. Pass null to hide the preview. */
   function setPreview(it) {
     if (!it) {
-      if (pvBox.contains(document.activeElement)) $('ex-title').focus();
+      if (pvBox.contains(document.activeElement)) {$('ex-title').focus();}
       pvBox.hidden = true; syncScroll(); return;
     }
     const d = describe(it);
@@ -2083,12 +2964,12 @@ yellow green 9acd32`;
   pvBox.addEventListener('toggle', () => {
     syncScroll();
     /* Opening the preview brings it to the top of the stage so the change is visible. */
-    if (pvBox.open) requestAnimationFrame(() => pvBox.scrollIntoView({ block: 'start', behavior: motionOff() ? 'auto' : 'smooth' }));
+    if (pvBox.open) {requestAnimationFrame(() => pvBox.scrollIntoView({ block: 'start', behavior: motionOff() ? 'auto' : 'smooth' }));}
   });
   if ('ResizeObserver' in window) {
     const ro = new ResizeObserver(() => requestAnimationFrame(syncScroll));
     [stage, slot, pvBox].forEach((n) => ro.observe(n));
-  } else window.addEventListener('resize', syncScroll);
+  } else {window.addEventListener('resize', syncScroll);}
 
   /* view = true builds the reference card used by the library viewer: no stamps and no swiping. */
   function buildCard(it, view) {
@@ -2097,7 +2978,7 @@ yellow green 9acd32`;
     card.setAttribute('aria-label', d.name + ' colour card');
     const body = el('div', 'ccard__body');
     const badges = badgesEl(d);
-    if (view) badges.append(el('span', 'badge badge--info', 'Kept on ' + d.bgLabel));
+    if (view) {badges.append(el('span', 'badge badge--info', 'Kept on ' + d.bgLabel));}
     body.append(el('h3', '', d.name), el('p', 'hint', nameHint(d)), codesEl(d), badges);
     if (view) { card.append(swatchEl(d), body); return card; }
     const k = el('span', 'stamp stamp--keep', 'Keep'); k.setAttribute('aria-hidden', 'true');
@@ -2108,7 +2989,7 @@ yellow green 9acd32`;
   }
 
   function renderCard(prefix) {
-    if (state.view) return;
+    if (state.view) {return;}
     if (!state.current) {
       const note = el('p', 'note note--warn');
       note.append(el('span', '', 'No fresh colour found with these settings. Restore some vetoes, loosen the settings, or press Undo.'));
@@ -2127,7 +3008,7 @@ yellow green 9acd32`;
   }
 
   function decide(kind) {
-    if (busy || state.view || !state.current) return;
+    if (busy || state.view || !state.current) {return;}
     busy = true;
     const it = state.current, d = describe(it);
     (kind === 'keep' ? state.library : state.blacklist).unshift(it);
@@ -2140,7 +3021,7 @@ yellow green 9acd32`;
     const finish = async () => {
       try { state.current = await takeNext(); } catch { state.current = null; }
       /* The explorer may have been closed during the fly-off: skip card and preview work, but still refresh the home lists. */
-      if (dlg.open) renderCard(verb + ' ' + d.name + '.'); else renderMain();
+      if (dlg.open) {renderCard(verb + ' ' + d.name + '.');} else {renderMain();}
       busy = false;
     };
     if (!card || !card.classList.contains('ccard') || motionOff()) { finish(); return; }
@@ -2152,11 +3033,11 @@ yellow green 9acd32`;
   }
 
   function undo() {
-    if (busy || state.view || !state.history.length) return;
+    if (busy || state.view || !state.history.length) {return;}
     const h = state.history.pop();
     const list = h.kind === 'keep' ? state.library : state.blacklist;
     const i = list.findIndex((x) => x.id === h.item.id);
-    if (i > -1) list.splice(i, 1);
+    if (i > -1) {list.splice(i, 1);}
     saveLists();
     state.current = h.item;
     const d = describe(h.item);
@@ -2174,28 +3055,28 @@ yellow green 9acd32`;
       setTimeout(() => card.classList.remove('is-settling'), SETTLE_MS);
     };
     card.addEventListener('pointerdown', (e) => {
-      if (busy || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      if (busy || (e.pointerType === 'mouse' && e.button !== 0)) {return;}
       id = e.pointerId; startX = e.clientX; dx = 0; dragging = false;
       card.classList.remove('is-settling');
       try { card.setPointerCapture(id); } catch { /* capture unavailable */ }
     });
     card.addEventListener('pointermove', (e) => {
-      if (e.pointerId !== id) return;
+      if (e.pointerId !== id) {return;}
       dx = e.clientX - startX;
       if (!dragging && Math.abs(dx) > DRAG_START_PX) { dragging = true; card.classList.add('is-dragging'); }
-      if (!dragging) return;
+      if (!dragging) {return;}
       card.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / TILT_DIVISOR + 'deg)';
       setStamps(Math.min(1, Math.abs(dx) / threshold()));
     });
     card.addEventListener('pointerup', (e) => {
-      if (e.pointerId !== id) return;
+      if (e.pointerId !== id) {return;}
       id = null; card.classList.remove('is-dragging');
-      if (!dragging) return;
+      if (!dragging) {return;}
       dragging = false;
-      if (Math.abs(dx) >= threshold()) decide(dx > 0 ? 'keep' : 'veto'); else snapBack();
+      if (Math.abs(dx) >= threshold()) {decide(dx > 0 ? 'keep' : 'veto');} else {snapBack();}
     });
     card.addEventListener('pointercancel', (e) => {
-      if (e.pointerId !== id) return;
+      if (e.pointerId !== id) {return;}
       id = null; card.classList.remove('is-dragging');
       if (dragging) { dragging = false; snapBack(); }
     });
@@ -2209,10 +3090,10 @@ yellow green 9acd32`;
     $('ex-help').hidden = Boolean(it);
     $('ex-view-actions').hidden = !it;
     say($('ex-status'), '');
-    if (it) say($('ex-count'), 'Kept on ' + BACKDROPS[it.bg].label); else updateChrome();
+    if (it) {say($('ex-count'), 'Kept on ' + BACKDROPS[it.bg].label);} else {updateChrome();}
   }
   function openViewer(it, key) {
-    if (dlg.open) return;
+    if (dlg.open) {return;}
     openerKey = key || null;
     setViewMode(it);
     resetPreview();
@@ -2226,24 +3107,24 @@ yellow green 9acd32`;
   }
   /* The lists are redrawn when the dialog closes, so put focus back on the tile that opened it (or its section heading if it is gone). */
   function restoreFocus() {
-    if (!openerKey) return;
+    if (!openerKey) {return;}
     const t = document.querySelector('[data-focus-key="' + openerKey + '"]');
-    if (t) t.focus(); else focusHeading($(openerKey.indexOf('recent') === 0 ? 'recent-heading' : 'lib-heading'));
+    if (t) {t.focus();} else {focusHeading($(openerKey.indexOf('recent') === 0 ? 'recent-heading' : 'lib-heading'));}
     openerKey = null;
   }
   const viewNote = (msg) => { say($('ex-status'), msg); say(live, msg); };
   $('view-copy-hex').addEventListener('click', async () => {
-    if (!state.view) return;
+    if (!state.view) {return;}
     const v = describe(state.view).hex6;
     viewNote(await copyText(v) ? 'Copied ' + v + '.' : 'Copying failed. Select the text and copy it by hand.');
   });
   $('view-copy-rgba').addEventListener('click', async () => {
-    if (!state.view) return;
+    if (!state.view) {return;}
     const v = describe(state.view).rgba;
     viewNote(await copyText(v) ? 'Copied ' + v + '.' : 'Copying failed. Select the text and copy it by hand.');
   });
   $('view-remove').addEventListener('click', () => {
-    const it = state.view; if (!it) return;
+    const it = state.view; if (!it) {return;}
     const d = describe(it);
     removeFromLibrary(it.id);
     say(libStatus, 'Removed ' + d.name + ' from your library.');
@@ -2251,7 +3132,7 @@ yellow green 9acd32`;
   });
 
   async function openExplorer() {
-    if (dlg.open) return;
+    if (dlg.open) {return;}
     openerKey = null;
     setViewMode(null);
     resetPreview();
@@ -2279,7 +3160,7 @@ yellow green 9acd32`;
   vetoBtn.addEventListener('click', () => decide('veto'));
   undoBtn.addEventListener('click', undo);
   dlg.addEventListener('keydown', (e) => {
-    if (state.view || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    if (state.view || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {return;}
     if (e.key === 'ArrowRight') { e.preventDefault(); decide('keep'); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); decide('veto'); }
   });
@@ -2287,6 +3168,6 @@ yellow green 9acd32`;
   renderMain();
   refreshNames();
 })();
-</script>
-</body>
+        </script>
+    </body>
 </html>
